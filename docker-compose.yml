@@ -1,0 +1,40 @@
+services:
+  nginx:
+    # image: nginx
+    build:
+      context: ./frontend/
+    ports:
+      - 8080:80
+    # volumes:
+    #   - ./create-intro/build/://usr/share/nginx/html
+    networks:
+      - frontend
+
+  backend:
+    build:
+      context: ./backend/
+    ports:
+      - 5000:8000
+    networks:
+      - frontend
+      - backend
+
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "InternetStore"
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "qwerty"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    networks:
+        - backend
+    volumes:
+      - ./db/:/docker-entrypoint-initdb.d
+      - ./db/storage/:/var/lib/postgresql/data/pgdata
+
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
