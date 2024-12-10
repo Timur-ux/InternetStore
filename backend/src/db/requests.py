@@ -1,66 +1,74 @@
 import src.db.sessionManager as sm
 from contextlib import closing
 from psycopg2.extras import DictCursor
-import hashlib
 import jwt
+import bcrypt
 import datetime
 
-def processAuth(sessionManager: sm.SessionManager, login: str, password: str):
-    with closing(sessionManager.createSession()) as session:
-        with session.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute('select * from locations'); # for connection to db test
-            return cursor.fetchall()
+SECRET_KEY = "your_super_secret_key"  # Рекомендуется хранить в переменных окружения
 
-SECRET_KEY = "your_jwt_secret_key"
+def hash_password(password: str) -> str:
+    """
+    Хеширует пароль с использованием bcrypt.
+    """
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode(), salt).decode()
 
-import hashlib
-from contextlib import closing
+def verify_password(password: str, hashed: str) -> bool:
+    """
+    Проверяет пароль с хешем.
+    """
+    return bcrypt.checkpw(password.encode(), hashed.encode())
+
+def generate_jwt(user_id: int, access_level: int) -> str:
+    """
+    Генерация JWT токена с SHA-256.
+    """
+    payload = {
+        "user_id": user_id,
+        "access_level": access_level,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+def verify_jwt(token: str) -> dict:
+    """
+    Проверяет валидность JWT токена.
+    """
+    try:
+        return jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        raise ValueError("Token expired")
+    except jwt.InvalidTokenError:
+        raise ValueError("Invalid token")
 
 def create_user(sessionManager, login, password, access_level=1):
-    # Хешируем пароль с использованием SHA-256
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    
-    # Открываем сессию с базой данных и выполняем запрос
+    """
+    Создает нового пользователя с хешированным паролем.
+    """
+    hashed_password = hash_password(password)
     with closing(sessionManager.createSession()) as session:
         with session.cursor() as cursor:
-            # Вставляем нового пользователя с хешированным паролем
             cursor.execute(
                 "INSERT INTO users (login, password, access_level) VALUES (%s, %s, %s)",
                 (login, hashed_password, access_level)
             )
-            # Сохраняем изменения в базе данных
             session.commit()
 
 def authenticate_user(sessionManager, login, password):
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    """
+    Аутентифицирует пользователя по логину и паролю.
+    """
     with closing(sessionManager.createSession()) as session:
         with session.cursor(cursor_factory=DictCursor) as cursor:
             cursor.execute(
-                "SELECT * FROM users WHERE login = %s AND password = %s",
-                (login, hashed_password)
+                "SELECT * FROM users WHERE login = %s",
+                (login,)
             )
             user = cursor.fetchone()
-            if user:
-                token = jwt.encode(
-                    {"user_id": user["id"], "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
-                    SECRET_KEY,
-                    algorithm="HS256"
-                )
-                return token
+            if user and verify_password(password, user["password"]):
+                return generate_jwt(user["id"], user["access_level"])
             return None
-
-def get_products(sessionManager):
-    with closing(sessionManager.createSession()) as session:
-        with session.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("SELECT * FROM products")
-            return cursor.fetchall()
-
-def get_product_by_id(sessionManager, product_id):
-    with closing(sessionManager.createSession()) as session:
-        with session.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
-            return cursor.fetchone()
-        
 
 def get_marks(sessionManager):
     with closing(sessionManager.createSession()) as session:
@@ -74,11 +82,7 @@ def get_mark_by_id(sessionManager, mark_id):
             cursor.execute("SELECT * FROM marks WHERE id = %s", (mark_id,))
             return cursor.fetchone()
 
-# Функция для добавления новой марки
 def add_mark(sessionManager, mark_id, mark_type, location_id, last_position):
-    """
-    Добавление новой записи в таблицу marks
-    """
     with closing(sessionManager.createSession()) as session:
         with session.cursor() as cursor:
             cursor.execute(
@@ -88,11 +92,7 @@ def add_mark(sessionManager, mark_id, mark_type, location_id, last_position):
             )
             session.commit()
 
-# Функция для обновления данных о марке
 def update_mark(sessionManager, mark_id, mark_type, location_id, last_position):
-    """
-    Обновление данных о марке с указанным mark_id
-    """
     with closing(sessionManager.createSession()) as session:
         with session.cursor() as cursor:
             cursor.execute(
