@@ -9,8 +9,8 @@
 
 ## Запросы в curl для проверки работы api
 
-регистрация пользователя
-```curl -X POST -H "Content-Type: application/json" -d '{"login": "your_login", "password": "your_password", "access_level": "1"}' http://localhost:5000/api/register```
+* регистрация пользователя
+`curl -X POST -H "Content-Type: application/json" -d '{"login": "your_login", "password": "your_password", "access_level": "1"}' http://localhost:5000/api/register`
 
 ### backend: TODO
   1. Сделать систему авторизации (банальная передача логина и пароля с занесением в базу данных)
