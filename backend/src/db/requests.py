@@ -42,32 +42,40 @@ def verify_jwt(token: str) -> dict:
     except jwt.InvalidTokenError:
         raise ValueError("Invalid token")
 
+import hashlib
+from contextlib import closing
+
 def create_user(sessionManager, login, password, access_level=1):
-    """
-    Создает нового пользователя с хешированным паролем.
-    """
-    hashed_password = hash_password(password)
+    # Хешируем пароль с использованием SHA-256
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    
+    # Открываем сессию с базой данных и выполняем запрос
     with closing(sessionManager.createSession()) as session:
         with session.cursor() as cursor:
+            # Вставляем нового пользователя с хешированным паролем
             cursor.execute(
                 "INSERT INTO users (login, password, access_level) VALUES (%s, %s, %s)",
                 (login, hashed_password, access_level)
             )
+            # Сохраняем изменения в базе данных
             session.commit()
 
 def authenticate_user(sessionManager, login, password):
-    """
-    Аутентифицирует пользователя по логину и паролю.
-    """
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     with closing(sessionManager.createSession()) as session:
         with session.cursor(cursor_factory=DictCursor) as cursor:
             cursor.execute(
-                "SELECT * FROM users WHERE login = %s",
-                (login,)
+                "SELECT * FROM users WHERE login = %s AND password = %s",
+                (login, hashed_password)
             )
             user = cursor.fetchone()
-            if user and verify_password(password, user["password"]):
-                return generate_jwt(user["id"], user["access_level"])
+            if user:
+                token = jwt.encode(
+                    {"user_id": user["id"], "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
+                    SECRET_KEY,
+                    algorithm="HS256"
+                )
+                return token
             return None
 
 def get_marks(sessionManager):
