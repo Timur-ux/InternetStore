@@ -18,9 +18,38 @@ curl -X POST -H "Content-Type: application/json" -d '{"login": "your_login", "pa
 curl -X POST -H "Content-Type: application/json" -d '{"login": "your_login", "password": "your_password"}' http://localhost:5000/api/login
 ```
 
+* список марок
+```bash
+curl -X GET http://localhost:5000/api/marks
+```
+
+* добавить марку
+```bash
+curl -X PUT -H "Content-Type: application/json" -d '{ 
+  "mark_id": 2,    
+  "mark_type": 100,
+  "location_id": 1,
+  "last_position": [10.5, 20.3, 30.7]
+}' http://localhost:5000/api/marks/1
+```
+* удалить марку
+```bash
+curl -X DELETE http://localhost:5000/api/marks/1
+```
+
+* обновить марку (пока что не работает)
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{   
+  "mark_id": 1,
+  "mark_type": 200,
+  "location_id": 2,
+  "last_position": [15.0, 25.3, 35.7]
+}' http://localhost:5000/api/marks/1
+```
+
 ### backend: TODO
   - [x] Сделать систему авторизации (банальная передача логина и пароля с занесением в базу данных)
-  - [ ] Сделать обработку основных запросов(получения списка товаров, получение какого-то конкретного товара и т.д.)
+  - [x] Сделать обработку основных запросов(получения списка товаров, получение какого-то конкретного товара и т.д.)
   - [ ] Обернуть все это дело в шифрованное соединение. Завернуть все в какое-нибудь SHA-256 шифрование и проверку личности через jwt токены
 
 ### frontend
