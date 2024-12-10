@@ -29,6 +29,7 @@ app.add_middleware(
 class LoginModel(BaseModel):
     login: str
     password: str
+    access_level: int 
 
 def verify_token(token: str):
     try:
@@ -46,8 +47,11 @@ def index():
 
 @app.post("/api/register")
 def register(user: LoginModel):
-    db_requests.create_user(sessionManager, user.login, user.password)
-    return {"message": "User registered successfully"}
+    try:
+        db_requests.create_user(sessionManager, user.login, user.password, user.access_level)
+        return {"message": "User registered successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error registering user: {e}")
 
 @app.get('/api/login')
 def auth():
