@@ -29,6 +29,10 @@ app.add_middleware(
 class LoginModel(BaseModel):
     login: str
     password: str
+
+class RegModel(BaseModel):
+    login: str
+    password: str
     access_level: int 
 
 def verify_token(token: str):
@@ -46,17 +50,19 @@ def index():
     return json.dumps(response)
 
 @app.post("/api/register")
-def register(user: LoginModel):
+def register(user: RegModel):
     try:
         db_requests.create_user(sessionManager, user.login, user.password, user.access_level)
         return {"message": "User registered successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error registering user: {e}")
 
-@app.get('/api/login')
-def auth():
-    # Do some auth login
-    return "some auth data"
+@app.post("/api/login")
+def login(user: LoginModel):
+    token = db_requests.authenticate_user(sessionManager, user.login, user.password)
+    if not token:
+        raise HTTPException(status_code=401, detail="Invalid login or password")
+    return {"token": token}
 
 @app.get('/api/products')
 def getProductList():
