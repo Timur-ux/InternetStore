@@ -13,14 +13,22 @@ def processAuth(sessionManager: sm.SessionManager, login: str, password: str):
 
 SECRET_KEY = "your_jwt_secret_key"
 
-def create_user(sessionManager, login, password):
+import hashlib
+from contextlib import closing
+
+def create_user(sessionManager, login, password, access_level=1):
+    # Хешируем пароль с использованием SHA-256
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    
+    # Открываем сессию с базой данных и выполняем запрос
     with closing(sessionManager.createSession()) as session:
         with session.cursor() as cursor:
+            # Вставляем нового пользователя с хешированным паролем
             cursor.execute(
-                "INSERT INTO users (login, password) VALUES (%s, %s)",
-                (login, hashed_password)
+                "INSERT INTO users (login, password, access_level) VALUES (%s, %s, %s)",
+                (login, hashed_password, access_level)
             )
+            # Сохраняем изменения в базе данных
             session.commit()
 
 def authenticate_user(sessionManager, login, password):
