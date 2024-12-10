@@ -13,6 +13,10 @@
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"login": "your_login", "password": "your_password", "access_level": "1"}' http://localhost:5000/api/register
 ```
+* вход пользователя
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"login": "your_login", "password": "your_password"}' http://localhost:5000/api/login
+```
 
 ### backend: TODO
   1. Сделать систему авторизации (банальная передача логина и пароля с занесением в базу данных)
