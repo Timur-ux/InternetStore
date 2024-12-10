@@ -60,3 +60,50 @@ def get_product_by_id(sessionManager, product_id):
         with session.cursor(cursor_factory=DictCursor) as cursor:
             cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
             return cursor.fetchone()
+        
+
+def get_marks(sessionManager):
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor(cursor_factory=DictCursor) as cursor:
+            cursor.execute("SELECT * FROM marks")
+            return cursor.fetchall()
+
+def get_mark_by_id(sessionManager, mark_id):
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor(cursor_factory=DictCursor) as cursor:
+            cursor.execute("SELECT * FROM marks WHERE id = %s", (mark_id,))
+            return cursor.fetchone()
+
+# Функция для добавления новой марки
+def add_mark(sessionManager, mark_id, mark_type, location_id, last_position):
+    """
+    Добавление новой записи в таблицу marks
+    """
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO marks (mark_id, mark_type, location_id, last_position) "
+                "VALUES (%s, %s, %s, %s)",
+                (mark_id, mark_type, location_id, last_position)
+            )
+            session.commit()
+
+# Функция для обновления данных о марке
+def update_mark(sessionManager, mark_id, mark_type, location_id, last_position):
+    """
+    Обновление данных о марке с указанным mark_id
+    """
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor() as cursor:
+            cursor.execute(
+                "UPDATE marks SET mark_type = %s, location_id = %s, last_position = %s "
+                "WHERE mark_id = %s",
+                (mark_type, location_id, last_position, mark_id)
+            )
+            session.commit()
+
+def delete_mark(sessionManager, mark_id):
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor() as cursor:
+            cursor.execute("DELETE FROM marks WHERE id = %s", (mark_id,))
+            session.commit()
