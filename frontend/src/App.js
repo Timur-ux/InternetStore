@@ -1,22 +1,27 @@
 import "./App.css";
 import style from "./style.js";
-import StartForm from "./startForm";
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import UserPage from "./components/UserPage";
-import AdminLogin from "./components/AdminLogin";
-import RedactorLogin from "./components/RedactorLogin.jsx"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Title from "./app/components/Title.jsx";
+import ProfileLine from "./app/components/ProfileLine.jsx";
+import InfoBlock from "./app/components/InfoBlock.jsx";
+import Footer from "./app/components/Footer.jsx";
+import ItemsLine from "./app/components/ItemsLine";
+import ItemInfo from "./app/components/ItemInfo";
+import Auth from "./app/components/Auth";
 
 const App = () => {
   return (
     <div style={style.mainBlock}>
-    <Router>
+      <Title />
+      <ProfileLine />
       <Routes>
-        <Route path="/" element={<StartForm/>} />
-        <Route path="/user" element={<UserPage />} />
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/redactor" element={<RedactorLogin />} />
+        <Route path="/" element={<InfoBlock />}>
+          <Route path="/" element={<ItemsLine />} />
+          <Route path="item" element={<ItemInfo/>}/>
+        </Route>
+      <Route path="/auth" element={<Auth/>}></Route>
       </Routes>
-    </Router>
+      <Footer />
     </div>
   );
 };
