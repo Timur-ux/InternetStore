@@ -1,22 +1,18 @@
 import "./App.css";
 import style from "./style.js";
-import StartForm from "./startForm";
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import UserPage from "./components/UserPage";
-import AdminLogin from "./components/AdminLogin";
-import RedactorLogin from "./components/RedactorLogin.jsx"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Title from "./app/components/Title.jsx";
+import ProfileLine from "./app/components/ProfileLine.jsx";
+import InfoBlock from "./app/components/InfoBlock.jsx";
+import Footer from "./app/components/Footer.jsx";
 
 const App = () => {
   return (
     <div style={style.mainBlock}>
-    <Router>
-      <Routes>
-        <Route path="/" element={<StartForm/>} />
-        <Route path="/user" element={<UserPage />} />
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/redactor" element={<RedactorLogin />} />
-      </Routes>
-    </Router>
+      <Title />
+      <ProfileLine />
+      <InfoBlock />
+      <Footer />
     </div>
   );
 };

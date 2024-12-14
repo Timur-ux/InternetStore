@@ -1,59 +1,39 @@
 const style = {
+  mainBlock: {
+    maxWidth: "100vw",
+  },
+  baseBackground: {
+    backgroundColor: "#EEEEEE",
+    border: "1px solid black",
+  },
+  title: {
+    maxWidth: "100%",
+    padding: "5px",
+    margin: "1px"
+  },
   centered: {
-    marginLeft: "auto",
-    marginRight: "auto",
-    width: "fit-content",
-    textAligment: "center",
-    border: "1px solid black"
-  },
-
-  centeredWidth: {
-    marginLeft: "auto",
-    marginRight: "auto",
-    width: "fit-content",
-    textAligment: "center",
-  },
-
-  textCentered: {
     textAlign: "center"
   },
-
-  mainForm: {
-    marginTop: "10%",
-    padding: "calc(5% + 5px)",
-    border: "2px solid black",
-    borderRadius: "10px",
-    backgroundColor: "#DDDDDD",
+  profileLine: {
+    display: "flex",
+    padding: "5px"
   },
-
-  mainBlock: {
-    width: "100%",
-    height: "100vh",
-  },
-
-  justifiedContent: {
+  profileMenu: {
     display: "flex",
     justifyContent: "space-between",
+    padding: "5px",
+    minWidth: "75%",
   },
-
-  profileData: {
-    width: "90vw",
-    padding: "1vmin",
-    textAlign: "right",
+  profileButton: {
+    marginLeft: "auto",
+    width: "fit-content",
+    backgroundColor: "#FFFFFF",
+    padding: "5px",
+    border: "2px solid gray",
+    borderRadius: "10px"
   },
-
-  logInDataField: {
-    margin: "5px",
-    marginBottom: "20px",
-    padding: "3px",
-    width: "100%",
-    fontSize: "24pt",
-    border: "1px solid gray",
-    backgroundColor: "#777777"
-  },
-
-  borderedBlock: {
-    border: "1px solid gray"
+  footer: {
+    marginTop: "30px",
   }
 }
 
