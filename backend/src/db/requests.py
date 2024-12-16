@@ -78,16 +78,19 @@ def authenticate_user(sessionManager, login, password):
                 return token
             return None
 
-def get_marks(sessionManager):
+def get_items(sessionManager):
     with closing(sessionManager.createSession()) as session:
         with session.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("SELECT * FROM marks")
+            cursor.execute("SELECT name, uri FROM items")
             return cursor.fetchall()
-
-def get_mark_by_id(sessionManager, mark_id):
+        
+def get_item_by_id(sessionManager, item_id):
+    """
+    Получает информацию о товаре из базы данных по его идентификатору.
+    """
     with closing(sessionManager.createSession()) as session:
         with session.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("SELECT * FROM marks WHERE id = %s", (mark_id,))
+            cursor.execute("SELECT name, uri, description, price, stock FROM items WHERE id = %s", (item_id,))
             return cursor.fetchone()
 
 def add_mark(sessionManager, mark_id, mark_type, location_id, last_position):

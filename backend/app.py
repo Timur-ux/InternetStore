@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
@@ -65,9 +65,21 @@ def login(user: LoginModel):
         raise HTTPException(status_code=401, detail="Invalid login or password")
     return {"token": token}
 
-@app.get("/api/marks", dependencies=[Depends(authenticate_user)])
+
+@app.get("/api/items", dependencies=[Depends(authenticate_user)])
 def list_marks():
-    return {"marks": db_requests.get_marks(sessionManager)}
+    return {"items": db_requests.get_items(sessionManager)}
+
+
+@app.get("/api/item")
+def get_item(id: int = Query(..., description=[Depends(authenticate_user)])):
+    """
+    Получение полной информации о товаре по его идентификатору.
+    """
+    item = db_requests.get_item_by_id(id)  # Вызов функции для получения данных из базы
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"data": item}
 
 @app.get("/api/marks/{mark_id}", dependencies=[Depends(authenticate_user)])
 def get_mark(mark_id: int):
