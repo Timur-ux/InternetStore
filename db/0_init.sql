@@ -1,6 +1,6 @@
-create database ArucoService;
+create database InternetStore;
 
-\c ArucoService
+\c InternetStore
 
 create table  item (
   id bigserial primary key,
@@ -22,4 +22,9 @@ create table  users (
   access_level bigint not null,
   login varchar(100),
   password varchar(64)
+);
+
+create table  access (
+  id bigserial primary key,
+  name varchar(100)
 );

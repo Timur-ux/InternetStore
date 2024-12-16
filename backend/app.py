@@ -1,15 +1,20 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 from typing import List
 import src.db.requests as db_requests
 from src.db.sessionManager import SessionManager
 from src.core.config import DB_CONFIG
-import json
+import hashlib
+import jwt
+import datetime
 
 sessionManager = SessionManager(DB_CONFIG)
 app = FastAPI()
+
+# ПЕРЕНЕСТИ В .env !!! 
+SECRET_KEY = "your_super_secret_key"
 
 # CORS settings
 origins = ["http://localhost:8080"]
@@ -23,7 +28,6 @@ app.add_middleware(
 
 # Security
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
-
 def authenticate_user(token: str = Depends(oauth2_scheme)):
     try:
         return db_requests.verify_jwt(token)
@@ -51,7 +55,30 @@ def index():
     return {"message": "Welcome to the Internet Store API"}
 
 @app.post("/api/register")
-def register(user: RegModel):
+def register(
+    user: RegModel, authorization: str = Header(None)
+):
+    """
+    Регистрация пользователя. Если токен отсутствует, создаётся обычный пользователь с уровнем доступа 1.
+    Только администраторы могут создавать других администраторов.
+    """
+    if authorization is None:
+        raise HTTPException(status_code=400, detail="Authorization header missing")
+    token = authorization.split(" ")[1]
+    # Если создаётся администратор, проверяем права текущего пользователя
+    if user.access_level == 2:
+        try:
+            # Проверяем токен
+            decoded_token = db_requests.verify_jwt(token)
+            print(decoded_token)  # Здесь вы можете использовать декодированный токен
+        except ValueError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+        # current_access_level = current_user.get("access_level")
+        # if current_access_level != 2:
+        #     raise PermissionError("Only administrators can create other administrators")
+
+            
+    # Выполняем создание пользователя
     try:
         db_requests.create_user(sessionManager, user.login, user.password, user.access_level)
         return {"message": "User registered successfully"}
@@ -80,31 +107,3 @@ def get_item(id: int = Query(..., description=[Depends(authenticate_user)])):
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"data": item}
-
-@app.get("/api/marks/{mark_id}", dependencies=[Depends(authenticate_user)])
-def get_mark(mark_id: int):
-    mark = db_requests.get_mark_by_id(sessionManager, mark_id)
-    if not mark:
-        raise HTTPException(status_code=404, detail="Mark not found")
-    return mark
-
-@app.put("/api/marks/{mark_id}", dependencies=[Depends(authenticate_user)])
-def create_mark(mark_id: int, mark: Mark):
-    try:
-        db_requests.add_mark(sessionManager, mark.mark_id, mark.mark_type, mark.location_id, mark.last_position)
-        return {"message": "Mark created successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating mark: {e}")
-
-@app.post("/api/marks/{mark_id}", dependencies=[Depends(authenticate_user)])
-def modify_mark(mark_id: int, mark: Mark):
-    try:
-        db_requests.update_mark(sessionManager, mark_id, mark.mark_type, mark.location_id, mark.last_position)
-        return {"message": "Mark updated successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error updating mark: {e}")
-
-@app.delete("/api/marks/{mark_id}", dependencies=[Depends(authenticate_user)])
-def remove_mark(mark_id: int):
-    db_requests.delete_mark(sessionManager, mark_id)
-    return {"message": "Mark deleted successfully"}

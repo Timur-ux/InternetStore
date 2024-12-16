@@ -5,7 +5,9 @@ import jwt
 import bcrypt
 import datetime
 
+# ПЕРЕНЕСТИ В .env !!! 
 SECRET_KEY = "your_super_secret_key"  # Рекомендуется хранить в переменных окружения
+
 
 def hash_password(password: str) -> str:
     """

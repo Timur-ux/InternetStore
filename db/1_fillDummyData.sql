@@ -1,5 +1,5 @@
 insert into
-  access(name, privileges)
+  access(name)
 values
   (
     'user'

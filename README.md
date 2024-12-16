@@ -47,6 +47,16 @@ curl -X POST -H "Content-Type: application/json" -d '{
 }' http://localhost:5000/api/marks/1
 ```
 
+* запрос на создание администратора 
+```bash
+curl -X POST \                         
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3MzQzNzI4MzN9.tU12RnzU0WjiHPvuaHeaYl732OjaNzWlgnCky_kGNOw" \
+-d '{"login": "your_login", "password": "your_password", "access_level": "2"}' \
+http://localhost:5000/api/register
+```
+
+
 ### backend: TODO
   - [x] Сделать систему авторизации (банальная передача логина и пароля с занесением в базу данных)
   - [x] Сделать обработку основных запросов(получения списка товаров, получение какого-то конкретного товара и т.д.)
