@@ -186,3 +186,30 @@ def get_selled_items(sessionManager, start_time: datetime.datetime):
                 (start_time,)
             )
             return cursor.fetchall()
+        
+
+
+def add_purchase(sessionManager, user_id: int, item_id: int, price: float, cnt: int):
+    """
+    Добавляет запись о покупке в таблицу buy.
+    
+    :param sessionManager: Менеджер сессий для подключения к базе данных
+    :param user_id: Идентификатор пользователя
+    :param item_id: Идентификатор товара
+    :param price: Цена товара
+    :param cnt: Количество товара
+    """
+    # Получаем текущую дату и время для записи в поле buy_time
+    buy_time = datetime.datetime.now()
+    
+    # Открываем сессию с базой данных и выполняем запрос
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO buy (user_id, price, cnt, buy_time)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (user_id, price, cnt, buy_time)
+            )
+            return cursor.fetchall()

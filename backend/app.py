@@ -114,6 +114,7 @@ def buy(
 ):
     """
     Покупка товаров. Считает общую стоимость и перенаправляет на сервис оплаты.
+    Также добавляет запись о покупке в базу данных.
     """
     user = authenticate_user(token)  # already returns user info
     user_id = user["user_id"]
@@ -123,8 +124,16 @@ def buy(
     if not items:
         raise HTTPException(status_code=404, detail="Items not found")
 
-    # Считаем стоимость
-    total_price = sum(item["price"] for item in items)
+    # Считаем стоимость и добавляем записи о покупке
+    total_price = 0
+    for item in items:
+        item_id = item["id"]
+        price = item["price"]
+        cnt = item_uris.item_uris.count(str(item_id))  # количество товара в запросе
+        total_price += price * cnt
+        
+        # Добавляем покупку в базу данных
+        db_requests.add_purchase(sessionManager, user_id, item_id, price, cnt)
 
     # Логируем покупку
     db_requests.log_user_action(sessionManager, user_id, f"Purchased items: {item_uris.item_uris}")
@@ -137,6 +146,7 @@ def buy(
         raise HTTPException(status_code=500, detail="Payment service error")
 
     return {"message": "Purchase successful", "payment_status": response.json()}
+
 
 
 @app.get("/api/recommendation")
