@@ -2,13 +2,15 @@ from fastapi import FastAPI, Depends, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
+import requests
 import src.db.requests as db_requests
 from src.db.sessionManager import SessionManager
 from src.core.config import DB_CONFIG
 import hashlib
 import jwt
 import datetime
+import os
 
 sessionManager = SessionManager(DB_CONFIG)
 app = FastAPI()
@@ -44,11 +46,8 @@ class RegModel(BaseModel):
     password: str
     access_level: int
 
-class Mark(BaseModel):
-    mark_id: int
-    mark_type: int
-    location_id: int
-    last_position: List[float]
+class BuyRequest(BaseModel):
+    item_uris: List[str]
 
 @app.get("/")
 def index():
@@ -107,3 +106,114 @@ def get_item(id: int = Query(..., description=[Depends(authenticate_user)])):
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"data": item}
+
+@app.post("/api/buy")
+def buy(
+    item_uris: BuyRequest,
+    token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
+):
+    """
+    Покупка товаров. Считает общую стоимость и перенаправляет на сервис оплаты.
+    """
+    user = authenticate_user(token)  # already returns user info
+    user_id = user["user_id"]
+
+    # Получение товаров по URI
+    items = db_requests.get_items_by_uris(sessionManager, item_uris.item_uris)
+    if not items:
+        raise HTTPException(status_code=404, detail="Items not found")
+
+    # Считаем стоимость
+    total_price = sum(item["price"] for item in items)
+
+    # Логируем покупку
+    db_requests.log_user_action(sessionManager, user_id, f"Purchased items: {item_uris.item_uris}")
+
+    # Перенаправляем на сервис оплаты
+    payment_service_url = os.getenv("PAYMENT_SERVICE_URL", "https://sber-payment-service.example.com/pay")
+    response = requests.post(payment_service_url, json={"amount": total_price, "user_id": user_id})
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail="Payment service error")
+
+    return {"message": "Purchase successful", "payment_status": response.json()}
+
+
+@app.get("/api/recommendation")
+def recommendation(
+    n: int = Query(1, ge=1),
+    token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
+):
+    """
+    Получение списка рекомендованных товаров.
+    """
+    user = authenticate_user(token.credentials)
+    user_id = user["user_id"]
+
+    # Получаем рекомендации
+    recommendations = db_requests.get_recommendations(sessionManager, user_id, n)
+    if not recommendations:
+        raise HTTPException(status_code=404, detail="No recommendations found")
+
+    # Логируем запрос
+    db_requests.log_user_action(sessionManager, user_id, f"Requested {n} recommendations")
+
+    return recommendations
+
+
+@app.get("/api/history")
+def history(
+    time: Optional[str] = None,
+    token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
+):
+    """
+    Получение истории действий пользователей.
+    """
+    user = authenticate_user(token.credentials)
+    if user["access_level"] < 2:  # Только администратор
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    start_time = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S") if time else datetime.datetime.now() - datetime.timedelta(days=1)
+    actions = db_requests.get_user_actions(sessionManager, start_time)
+
+    return {"actions": actions}
+
+
+@app.get("/api/selled")
+def selled(
+    time: Optional[str] = None,
+    token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
+):
+    """
+    Получение списка проданных товаров.
+    """
+    user = authenticate_user(token.credentials)
+    if user["access_level"] < 2:  # Только администратор
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    start_time = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S") if time else datetime.datetime.now() - datetime.timedelta(days=1)
+    selled_items = db_requests.get_selled_items(sessionManager, start_time)
+
+    return {"selled_items": selled_items}
+
+
+@app.get("/api/prediction")
+def prediction(
+    items: List[str],
+    token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
+):
+    """
+    Получение предсказаний от сервиса нейросети.
+    """
+    user = authenticate_user(token.credentials)
+    if user["access_level"] < 2:  # Только администратор
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    # Запрос к внешнему сервису предсказаний
+    prediction_service_url = "http://neural-service.example.com/predict"
+    response = requests.post(prediction_service_url, json={"items": items})
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail="Prediction service error")
+
+    return {"predictions": response.json()}

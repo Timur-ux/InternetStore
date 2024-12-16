@@ -7,6 +7,12 @@ values
   (
     'administrator'
   );
+insert into
+  action(name)
+values
+  (
+    'buy'
+  );
 
 insert into
  users(access_level, login, password)

@@ -50,10 +50,18 @@ from contextlib import closing
 def create_user(sessionManager, login, password, access_level=1):
     # Хешируем пароль с использованием SHA-256
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    
+
     # Открываем сессию с базой данных и выполняем запрос
     with closing(sessionManager.createSession()) as session:
         with session.cursor() as cursor:
+            # Проверяем, существует ли пользователь с таким логином
+            cursor.execute("SELECT COUNT(*) FROM users WHERE login = %s", (login,))
+            count = cursor.fetchone()[0]
+            
+            # Если пользователь уже существует, выбрасываем исключение
+            if count > 0:
+                raise ValueError(f"User with login '{login}' already exists.")
+
             # Вставляем нового пользователя с хешированным паролем
             cursor.execute(
                 "INSERT INTO users (login, password, access_level) VALUES (%s, %s, %s)",
@@ -83,7 +91,7 @@ def authenticate_user(sessionManager, login, password):
 def get_items(sessionManager):
     with closing(sessionManager.createSession()) as session:
         with session.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("SELECT name, uri FROM items")
+            cursor.execute("SELECT name, uri FROM item")
             return cursor.fetchall()
         
 def get_item_by_id(sessionManager, item_id):
@@ -92,31 +100,89 @@ def get_item_by_id(sessionManager, item_id):
     """
     with closing(sessionManager.createSession()) as session:
         with session.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("SELECT name, uri, description, price, stock FROM items WHERE id = %s", (item_id,))
+            cursor.execute("SELECT name, uri, description, price, stock FROM item WHERE id = %s", (item_id,))
             return cursor.fetchone()
 
-def add_mark(sessionManager, mark_id, mark_type, location_id, last_position):
+# Логирование действий пользователя
+def log_user_action(sessionManager, user_id: int, action: str):
+    """
+    Логирует действия пользователя с текущим временем.
+    """
     with closing(sessionManager.createSession()) as session:
         with session.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO marks (mark_id, mark_type, location_id, last_position) "
-                "VALUES (%s, %s, %s, %s)",
-                (mark_id, mark_type, location_id, last_position)
+                "INSERT INTO user_action (user_id, action) VALUES (%s, %s)",
+                (user_id, action)
             )
             session.commit()
 
-def update_mark(sessionManager, mark_id, mark_type, location_id, last_position):
+# Получение списка товаров по URI
+def get_items_by_uris(sessionManager, item_uris: list):
+    """
+    Получение информации о товарах по списку URI.
+    """
     with closing(sessionManager.createSession()) as session:
-        with session.cursor() as cursor:
+        with session.cursor(cursor_factory=DictCursor) as cursor:
             cursor.execute(
-                "UPDATE marks SET mark_type = %s, location_id = %s, last_position = %s "
-                "WHERE mark_id = %s",
-                (mark_type, location_id, last_position, mark_id)
+                "SELECT id, name, price FROM item WHERE uri::text = ANY(%s)",
+                (item_uris,)
             )
-            session.commit()
+            return cursor.fetchall()
 
-def delete_mark(sessionManager, mark_id):
+# Получение рекомендаций на основе покупок
+def get_recommendations(sessionManager, user_id: int, n: int):
+    """
+    Генерация списка рекомендованных товаров на основе покупок текущего пользователя.
+    """
     with closing(sessionManager.createSession()) as session:
-        with session.cursor() as cursor:
-            cursor.execute("DELETE FROM marks WHERE id = %s", (mark_id,))
-            session.commit()
+        with session.cursor(cursor_factory=DictCursor) as cursor:
+            cursor.execute(
+                """
+                SELECT DISTINCT i.id, i.name, i.price
+                FROM buy b1
+                JOIN buy b2 ON b1.item_id = b2.item_id
+                JOIN item i ON b2.item_id = i.id
+                WHERE b1.user_id = %s AND b2.user_id != %s
+                LIMIT %s
+                """,
+                (user_id, user_id, n)
+            )
+            return cursor.fetchall()
+
+
+# Получение истории действий пользователей
+def get_user_actions(sessionManager, start_time: datetime.datetime):
+    """
+    Получение истории действий пользователей.
+    """
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor(cursor_factory=DictCursor) as cursor:
+            cursor.execute(
+                """
+                SELECT user_id, action, action_time
+                FROM user_action
+                WHERE action_time >= %s
+                ORDER BY action_time DESC
+                """,
+                (start_time,)
+            )
+            return cursor.fetchall()
+
+# Получение проданных товаров
+def get_selled_items(sessionManager, start_time: datetime.datetime):
+    """
+    Получение списка проданных товаров с момента start_time.
+    """
+    with closing(sessionManager.createSession()) as session:
+        with session.cursor(cursor_factory=DictCursor) as cursor:
+            cursor.execute(
+                """
+                SELECT i.id, i.name, i.price, b.buy_time
+                FROM item i
+                JOIN buy b ON i.id = b.item_id
+                WHERE b.buy_time >= %s
+                ORDER BY b.buy_time DESC
+                """,
+                (start_time,)
+            )
+            return cursor.fetchall()
