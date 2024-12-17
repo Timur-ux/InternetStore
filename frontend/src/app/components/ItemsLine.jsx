@@ -8,6 +8,7 @@ import {
   selectState,
 } from "../reducers/itemsList";
 import ItemInfo from "./ItemInfo";
+import ItemOnItemsLine from "./ItemOnItemsLine";
 
 const ItemsLine = () => {
   const dispatch = useDispatch();
@@ -20,10 +21,10 @@ const ItemsLine = () => {
     }
   }, [itemsStatus, dispatch]);
 
-  const itemsElements = items.map( (item) => <ItemInfo data={item}/>)
+  const itemsElements = items.map( (item) => <ItemOnItemsLine {...item}/>)
 
   // return <div style={style}>{items.length == 0 ? itemsStatus : itemsElements}</div>;
-  return <div style={style}>{itemsElements}</div>;
+  return <div style={style.itemsLine}>{itemsElements}</div>;
 };
 
 export default ItemsLine;

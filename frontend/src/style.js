@@ -34,6 +34,8 @@ const style = {
   },
   footer: {
     marginTop: "30px",
+    display: "flex",
+    padding: "10px",
   },
   infoBlock: {
     width: "100%",
@@ -43,6 +45,10 @@ const style = {
   },
   itemsLine: {
     display: "flex",
+    justifyContent: "space-between",
+    border: "1px solid black",
+    paddingLeft: "5%",
+    paddingRight: "5%",
   },
   textField: {
     backgroundColor: "#FFFFFF",
@@ -53,6 +59,22 @@ const style = {
     marginRight: "auto",
     border: "1px solid green",
     margin: "5px",
+  },
+  footerItem: {
+    marginLeft: "5%",
+    marginTop: "10px",
+  },
+  cartInfo: {
+    width: "fit-content",
+    marginLeft: "auto",
+    marginRight: "auto",
+    border: "2px solid black",
+    borderRadius: "10px",
+    display: "flex",
+    justifyContent: "space-between",
+    minWidth: "60%",
+    marginTop: "5%",
+    padding: "30px"
   },
 };
 

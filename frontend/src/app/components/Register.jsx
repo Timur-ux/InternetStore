@@ -4,7 +4,7 @@ import { setLogin, setPassword } from "../reducers/authData";
 import { store } from "../store";
 import TextField from "./TextField";
 
-const Auth = () => {
+const Register = () => {
   var authData = {};
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
@@ -13,9 +13,9 @@ const Auth = () => {
     return () => unsubscribe();
   }, []);
 
-  const onAuthClick = () => {
+  const onRegisterClick = () => {
     const { login, password } = authData;
-    console.log("auth processing:", authData);
+    console.log("Register processing:", authData);
   };
 
   return (
@@ -26,13 +26,14 @@ const Auth = () => {
       <TextField onBlur={setPassword} type="password" />
       <br />
       <div style={style.itemsLine}>
-        <button style={style.centered} onClick={onAuthClick}>
+        <button style={style.centered} onClick={onRegisterClick}>
           Submit
         </button>
-        <a href="/register">Регистрация</a>
+        <a href="/auth">Авторизация</a>
       </div>
     </div>
   );
 };
 
-export default Auth;
+export default Register;
+
