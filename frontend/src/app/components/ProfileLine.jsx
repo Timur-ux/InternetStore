@@ -9,9 +9,13 @@ const ProfileLine = () => {
   return (
     <div style={{...style.profileLine, ...style.baseBackground}}>
       <Routes>
+        <Route path="/">
         <Route path="profile">
-          <Route path=":profileName" element={<ProfileMenu menuItems={baseMenuItems.concat(userMenuItems)}/>}/>
+          <Route path=":profileName" element={<ProfileMenu useProfile={true}/>}/>
         </Route>
+        <Route path="*" element={<ProfileMenu useProfile={false}/>} />
+        </Route>
+        
       </Routes>
       <Profile />
     </div>
