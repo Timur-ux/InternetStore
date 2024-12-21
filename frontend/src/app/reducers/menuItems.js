@@ -1,7 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  data: [],
+  data: [
+    {
+      id: 1,
+      name: "Go back",
+      path: -1
+    },
+  ],
 };
 
 const menuItemsSlice = createSlice({
@@ -9,7 +15,7 @@ const menuItemsSlice = createSlice({
   initialState,
   reducers: {
     setMenuItems(state, action) {
-      state.data = action.payload;
+      state.data = initialState.data.concat(action.payload);
     },
   },
 });
