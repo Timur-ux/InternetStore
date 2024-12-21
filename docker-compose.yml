@@ -16,6 +16,12 @@ services:
       - frontend
       - backend
 
+  ml:
+    build:
+      context: ./ml/
+    networks:
+      - backend
+
   postgres:
     image: postgres:13.3
     environment:
