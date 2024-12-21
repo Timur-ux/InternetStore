@@ -34,12 +34,17 @@ const itemsSlice = createSlice({
       state.data.push(action.payload);
     },
     itemUpdated(state, action) {
-      const { id, title, content } = action.payload;
+      const { id, title, uri, description } = action.payload;
       const existingItem = state.data.find((item) => item.id === id);
       if (existingItem) {
         existingItem.title = title;
-        existingItem.content = content;
+        existingItem.uri = uri;
+        existingItem.description = description;
       }
+    },
+    itemRemoved(state, action) {
+      const { id } = action.payload;
+      state.data = state.data.filter((item) => item.id !== id);
     },
   },
   extraReducers: (builder) =>
@@ -57,7 +62,7 @@ const itemsSlice = createSlice({
       }),
 });
 
-export const { itemAdded, itemUpdated } = itemsSlice.actions;
+export const { itemAdded, itemUpdated, itemRemoved } = itemsSlice.actions;
 export default itemsSlice.reducer;
 
 export const selectState = (state) => state;

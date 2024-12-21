@@ -16,6 +16,7 @@ const style = {
   },
   profileLine: {
     display: "flex",
+    justifyContent: "space-between",
     padding: "5px",
   },
   profileMenu: {
@@ -25,10 +26,10 @@ const style = {
     minWidth: "75%",
   },
   profileButton: {
-    marginLeft: "auto",
+    margin: "5px 5px 5px 5px",
     width: "fit-content",
     backgroundColor: "#FFFFFF",
-    padding: "5px",
+    padding: "10px",
     border: "2px solid gray",
     borderRadius: "10px",
   },

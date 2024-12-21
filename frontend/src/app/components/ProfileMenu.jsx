@@ -6,8 +6,6 @@ import ProfileMenuItem from "./ProfileMenuItem.jsx"
 
 const ProfileMenu = () => {
   const items = useSelector(selectMenuItemsData);
-  console.log(items);
-
   const buttons = items.map((item) =>
     <ProfileMenuItem name={item.name} path={item.path} />
   );
