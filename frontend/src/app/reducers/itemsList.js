@@ -21,7 +21,7 @@ export const fetchItems = createAsyncThunk(
 
 const initialState = {
   // data: [],
-  data: [{title: "item1", uri: "/api/item/1", description: "Some description about item 1"}, {title: "item2", uri: "/api/item/2", description: "Some description about item 2"}],
+  data: [{id: 1, title: "item1", uri: "/api/item/1", description: "Some description about item 1"}, {id: 2, title: "item2", uri: "/api/item/2", description: "Some description about item 2"}],
   status: "idle",
   error: null,
 };

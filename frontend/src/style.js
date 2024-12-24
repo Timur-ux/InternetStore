@@ -77,6 +77,15 @@ const style = {
     marginTop: "5%",
     padding: "30px"
   },
+  forecastSelectionMenu: {
+    width: "fit-content",
+    marginLeft: "auto",
+    marginRight: "auto",
+    border: "2px solid black",
+    minWidth: "60%",
+    marginTop: "5%",
+    padding: "30px"
+  }
 };
 
 export default style;

@@ -23,7 +23,14 @@ const itemsBatchSlice = createSlice({
       const {batchId, items} = action.payload;
       const existingBatch = state.data.find((batch) => batch.id === batchId);
       if (existingBatch) {
-        existingBatch.items.push(items);
+        console.log("Items batch: add: found");
+        for (let i = 0, len = items.length; i < len; i++) {
+          existingBatch.items.push(items[i]);
+        }
+      }
+      else {
+        console.log("Items batch: add: not found, creating:", {batchId, items});
+        state.data.push({id: batchId, items: items});
       }
       console.log("Items Batch:", batchId, ": add:", action.payload);
     },
@@ -37,7 +44,7 @@ const itemsBatchSlice = createSlice({
       }
       console.log("Items Batch:", batchId, ": remove:", action.payload);
     },
-  },
+  }
 });
 
 export const { setBatch, addToBatch, removeFromBatch } = itemsBatchSlice.actions;
@@ -45,3 +52,9 @@ export default itemsBatchSlice.reducer;
 
 export const selectItemsBatch = (batchId) => (state) => state.itemsBatch.data.find((batch) => batch.id === batchId);
 
+export const selectItemFromBatch = (batchId, itemId) => (state) => {
+  const existingBatch = state.itemsBatch.find((batch) => batch.id == batchId);
+  if(existingBatch)
+    return existingBatch.find((item) => item.id == itemId);
+  return null;
+}

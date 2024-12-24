@@ -1,11 +1,18 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import style from "../../style";
 
-const ItemOnItemsLine = ({ title = "None", uri, description = "" }) => {
+const ItemOnItemsLine = ({id, title = "None", uri, description = "" , onClickAction = null}) => {
   const navigate = useNavigate();
-  const onCLickButton = () =>
-    navigate("/item", { state: { title, uri, description } });
+  const dispatch = useDispatch()
+  const onCLickButton = () => {
+    if(onClickAction === null)
+      navigate("/item", { state: {id, title, uri, description } });
+    else {
+      onClickAction({id, title, uri, description}, dispatch);
+    }
+  }
 
   return (
     <div style={style.itemOnItemsLine}>
