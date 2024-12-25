@@ -2,14 +2,31 @@ create database InternetStore;
 
 \c InternetStore
 
-create table  item (
-  id bigserial primary key,
-  name varchar(100),
-  uri BIGINT not NULL,
-  description TEXT,
-  price NUMERIC(10, 2),
-  stock INT
+CREATE TABLE item (
+  id BIGSERIAL PRIMARY KEY,                     -- Уникальный идентификатор товара
+  item_id BIGINT NOT NULL,                      -- Уникальный идентификатор товара
+  item_name VARCHAR(100) NOT NULL,              -- Название товара
+  uri VARCHAR(255) NOT NULL,                    -- URL для получения данных о товаре
+  item_category_id BIGINT NOT NULL,             -- Уникальный идентификатор категории товара
+  item_price NUMERIC(10, 2) NOT NULL,          -- Текущая цена товара
+  item_cnt_day INT,                             -- Количество проданных товаров за день
+  date DATE,                                     -- Дата в формате dd/mm/yyyy
+  date_block_num INT,                           -- Номер месяца (0 - январь 2013, 1 - февраль 2013 и т.д.)
+  shop_id BIGINT NOT NULL,                      -- Уникальный идентификатор магазина
+  shop_name VARCHAR(100) NOT NULL,              -- Название магазина
+  item_category_name VARCHAR(100) NOT NULL      -- Название категории товара
 );
+
+CREATE TABLE shop (
+  shop_id BIGSERIAL PRIMARY KEY,                -- Уникальный идентификатор магазина
+  shop_name VARCHAR(100) NOT NULL               -- Название магазина
+);
+
+CREATE TABLE item_category (
+  item_category_id BIGSERIAL PRIMARY KEY,       -- Уникальный идентификатор категории товара
+  item_category_name VARCHAR(100) NOT NULL       -- Название категории товара
+);
+
 
 CREATE TABLE user_actions (
   id bigserial PRIMARY KEY,

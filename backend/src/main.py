@@ -5,7 +5,10 @@ from src.core.config import DB_CONFIG
 from src.db.sessionManager import SessionManager
 
 # Initialize application
-app = FastAPI()
+app = FastAPI(
+    title="Internet Store API",
+    version="1.0.0",
+)
 
 # CORS settings
 origins = ["http://localhost:8080"]
@@ -21,9 +24,9 @@ app.add_middleware(
 sessionManager = SessionManager(DB_CONFIG)
 
 # Include routers
-app.include_router(auth.router, prefix="/api/v1")
-app.include_router(items.router, prefix="/api/v1")
-app.include_router(admin.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1", tags=["Authentication"])
+app.include_router(items.router, prefix="/api/v1", tags=["Items"])
+app.include_router(admin.router, prefix="/api/v1", tags=["Admin"])
 
 @app.get("/")
 def index():
