@@ -1,10 +1,15 @@
-import React, { act, useState } from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { LogInOutProcess } from "../../services/LogInOutProcess";
 import style from "../../style";
+import { AuthStatus, selectAuthStatus } from "../reducers/authData";
 
 const Profile = () => {
   const [display, setDisplay] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const authStatus = useSelector(selectAuthStatus);
 
   const items = [
     {
@@ -12,8 +17,8 @@ const Profile = () => {
       action: () => navigate("/cart"),
     },
     {
-      title: "Log out",
-      action: () => console.log("Process log out"),
+      title: authStatus == AuthStatus.logged ? "Log out" : "Log in",
+      action: () => LogInOutProcess(authStatus)({dispatch, navigate}),
     }
   ];
 

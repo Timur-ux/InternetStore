@@ -13,16 +13,13 @@ const ItemsBatchLine = ({batchId, itemAction}) => {
   else{
     items = items.items;
   }
-  console.log("ItemsBatchLine", batchId, ": items:", items);
 
   useEffect(() => {
     const unsubscribe = store.subscribe(
       () => {
-        console.log("H:", batchId);
         const batch = store.getState().itemsBatch.data.find((batch) => batch.id === batchId);
         if (batch) {
           items = batch.items;
-          console.log("H:", batchId, "items: ", items);
         }
       }
     );

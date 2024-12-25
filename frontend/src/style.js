@@ -85,6 +85,12 @@ const style = {
     minWidth: "60%",
     marginTop: "5%",
     padding: "30px"
+  },
+  cartItemStyle: {
+    display: "flex",
+    justifyContent: "space-between",
+    margin: "10px",
+    padding: "2px",
   }
 };
 

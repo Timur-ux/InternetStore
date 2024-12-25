@@ -8,16 +8,18 @@ const ItemInfo = () => {
   const dispatch = useDispatch();
   console.log("Item Info: state:", useLocation().state);
 
-  const { title, uri, description } = useLocation().state;
+  const data = useLocation().state;
+  const {id, title, uri, description, price } = data;
 
   const onClickButton = () => {
-    dispatch(addToCart({ title, uri, description }));
+    dispatch(addToCart(data));
   };
 
   return (
     <div style={style.itemInfo}>
-      <p>{title}</p>
-      <p>{description}</p>
+      <p>Title: {title}</p>
+      <p>Description: {description}</p>
+      <p> Price: {price} </p>
       <button onClick={onClickButton}>Add to cart</button>
     </div>
   );

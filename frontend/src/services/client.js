@@ -2,7 +2,7 @@ import { data } from "@remix-run/router";
 import axios from "axios";
 import addresses from "./addresses";
 
-const client = axios.create({ baseURL: addresses, withCredentials: true });
+const client = axios.create({ baseURL: addresses.backend, withCredentials: true });
 
 export const RequestType = {
   get: "GET",
@@ -12,6 +12,7 @@ export const RequestType = {
 };
 
 export const doRequest = async ({ type, uri, params = {}, body = {} }) => {
+  console.log("doRequest: uri: ", uri);
   switch (type) {
     case RequestType.get:
       return await client.get(uri, { params: params });

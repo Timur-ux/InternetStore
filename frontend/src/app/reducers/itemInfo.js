@@ -1,12 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import client from "../../services/client";
+import client, { doRequest, RequestType } from "../../services/client";
 
 export const fetchItemData = createAsyncThunk(
   "item/fetchItemData",
   async (item_id) => {
-    const response = await client.get("/api/item", {
-      params: { item_id: item_id },
-    });
+    const response = await doRequest({type: RequestType.get, uri: "/item", params: { item_id: item_id },});
     return response.data;
   },
   {

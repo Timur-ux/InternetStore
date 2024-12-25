@@ -6,7 +6,6 @@ import ItemsBatchLine from "./ItemsBatchLine";
 import style from "../../style";
 import { selectAllItems, selectItemsStatus, fetchItems } from "../reducers/itemsList";
 import { store } from "../store";
-import { useSubmit } from "react-router-dom";
 
 const ForecastSelection = () => {
   const dispatch = useDispatch();
@@ -36,8 +35,7 @@ const ForecastSelection = () => {
         unsubscribe();
       }
     }
-  }, [itemsStatus, dispatch]);
-  console.log("Forecast: items:", items);
+  }, [itemsStatus]);
   
   const onClick_ = () => {
     console.log("On realize i would send these items to forecast: ", selectedItems);
