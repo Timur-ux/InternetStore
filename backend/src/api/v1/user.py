@@ -1,15 +1,18 @@
 from services.balance import get_user_balance, top_up_balance
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Cookie
 from db.session import get_session
 from services.purchase import process_purchase
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
-
+from dependencies.auth import get_current_user
 
 router = APIRouter()
 
 @router.get("/user/balance", summary="Получить баланс пользователя")
-async def get_balance(user_id: int, session: AsyncSession = Depends(get_session)):
+async def get_balance(
+    session: AsyncSession = Depends(get_session),
+    user_id: int = Depends(get_current_user)
+):
     try:
         balance = await get_user_balance(session, user_id)
         return {"balance": balance}
@@ -17,7 +20,10 @@ async def get_balance(user_id: int, session: AsyncSession = Depends(get_session)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/user/balance/top-up", summary="Пополнить баланс пользователя")
-async def top_up(user_id: int, amount: float):
+async def top_up(
+    amount: float,
+    user_id: int = Depends(get_current_user),
+):
     try:
         payment_url = await top_up_balance(user_id, amount)
         return {"payment_url": payment_url}
@@ -27,7 +33,9 @@ async def top_up(user_id: int, amount: float):
 
 @router.post("/purchase", summary="Оформить покупку")
 async def purchase_items(
-    uris: List[str], user_id: int, session: AsyncSession = Depends(get_session)
+    uris: List[str],
+    session: AsyncSession = Depends(get_session),
+    user_id: int = Depends(get_current_user),
 ):
     try:
         await process_purchase(session, user_id, uris)

@@ -12,7 +12,7 @@ VALUES
 -- Заполнение таблицы users
 INSERT INTO users(access_level, login, password)
 VALUES
-  ((SELECT id FROM access WHERE name = 'administrator'), 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
+  ((SELECT id FROM access WHERE name = 'administrator'), 'admin', '$2a$10$YgzepzPAE0OZWr9P6mQVu.Ind9xcSN/DGCfOiVT8XClxWjWLWbfpa');
 
 -- Заполнение таблицы shop
 INSERT INTO shop(shop_name)
