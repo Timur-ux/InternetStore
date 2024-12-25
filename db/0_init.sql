@@ -2,24 +2,32 @@ create database internetstore;
 
 \c internetstore
 
+-- Обновление таблицы item (удаление shop_id)
 CREATE TABLE item (
-  id BIGSERIAL PRIMARY KEY,                     -- Уникальный идентификатор товара
-  item_id BIGINT NOT NULL,                      -- Уникальный идентификатор товара
-  item_name VARCHAR(100) NOT NULL,              -- Название товара
-  uri VARCHAR(255) NOT NULL,                    -- URL для получения данных о товаре
-  item_category_id BIGINT NOT NULL,             -- Уникальный идентификатор категории товара
-  item_price NUMERIC(10, 2) NOT NULL,          -- Текущая цена товара
-  item_cnt_day INT,                             -- Количество проданных товаров за день
-  date DATE,                                     -- Дата в формате dd/mm/yyyy
-  date_block_num INT,                           -- Номер месяца (0 - январь 2013, 1 - февраль 2013 и т.д.)
-  shop_id BIGINT NOT NULL,                      -- Уникальный идентификатор магазина
-  shop_name VARCHAR(100) NOT NULL,              -- Название магазина
-  item_category_name VARCHAR(100) NOT NULL      -- Название категории товара
+  item_id BIGSERIAL PRIMARY KEY,                       -- Уникальный идентификатор товара
+  item_name VARCHAR(100) NOT NULL,                -- Название товара
+  uri VARCHAR(255) NOT NULL,                      -- URL для получения данных о товаре
+  item_category_id BIGINT NOT NULL,               -- Уникальный идентификатор категории товара
+  item_price NUMERIC(10, 2) NOT NULL,            -- Текущая цена товара
+  item_cnt_day INT,                               -- Количество проданных товаров за день
+  date DATE,                                       -- Дата в формате dd/mm/yyyy
+  date_block_num INT,                             -- Номер месяца (0 - январь 2013, 1 - февраль 2013 и т.д.)
+  item_category_name VARCHAR(100) NOT NULL        -- Название категории товара
 );
 
+-- Обновление таблицы shop (остается без изменений)
 CREATE TABLE shop (
-  shop_id BIGSERIAL PRIMARY KEY,                -- Уникальный идентификатор магазина
-  shop_name VARCHAR(100) NOT NULL               -- Название магазина
+  shop_id BIGSERIAL PRIMARY KEY,                  -- Уникальный идентификатор магазина
+  shop_name VARCHAR(100) NOT NULL                 -- Название магазина
+);
+
+-- Создание промежуточной таблицы для связи многие-ко-многим
+CREATE TABLE item_shop (
+  item_id BIGINT NOT NULL,                       -- Уникальный идентификатор товара
+  shop_id BIGINT NOT NULL,                       -- Уникальный идентификатор магазина
+  PRIMARY KEY (item_id, shop_id),                -- Композитный первичный ключ
+  FOREIGN KEY (item_id) REFERENCES item(item_id),     -- Внешний ключ на таблицу item
+  FOREIGN KEY (shop_id) REFERENCES shop(shop_id) -- Внешний ключ на таблицу shop
 );
 
 CREATE TABLE item_category (

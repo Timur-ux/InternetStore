@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.v1 import auth, items, admin
+from src.api.v1 import auth, items, admin, user
 
 # Initialize application
 app = FastAPI(
@@ -24,6 +24,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/v1", tags=["Authentication"])
 app.include_router(items.router, prefix="/api/v1", tags=["Items"])
 app.include_router(admin.router, prefix="/api/v1", tags=["Admin"])
+app.include_router(user.router, prefix="/api/v1", tags=["UserActions"])
 
 @app.get("/")
 def index():
