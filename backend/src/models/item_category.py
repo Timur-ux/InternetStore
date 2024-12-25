@@ -1,4 +1,5 @@
 from sqlalchemy import Column, BigInteger, String
+from sqlalchemy.orm import relationship
 from models.base import Base
 
 class ItemCategory(Base):
