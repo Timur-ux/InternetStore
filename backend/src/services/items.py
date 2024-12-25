@@ -1,43 +1,46 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from models.item import Item
-from db.session import get_session
 
 
-def get_all_items():
+async def get_all_items(session: AsyncSession):
     """
     Получить список всех товаров.
     """
-    with get_session() as db:
-        return db.query(Item).all()
+    stmt = select(Item)
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 
-def get_item(item_id: int):
+async def get_item(session: AsyncSession, item_id: int):
     """
     Получить информацию о товаре по его ID.
     """
-    with get_session() as db:
-        return db.query(Item).filter(Item.id == item_id).first()
+    stmt = select(Item).where(Item.id == item_id)
+    result = await session.execute(stmt)
+    return result.scalars().first()
 
 
-def create_item(item_data: dict):
+async def create_item(session: AsyncSession, item_data: dict):
     """
     Добавить новый товар.
     """
-    with get_session() as db:
-        new_item = Item(**item_data)
-        db.add(new_item)
-        db.commit()
-        db.refresh(new_item)
-        return new_item
+    new_item = Item(**item_data)
+    session.add(new_item)
+    await session.commit()
+    await session.refresh(new_item)
+    return new_item
 
 
-def delete_item(item_id: int):
+async def delete_item(session: AsyncSession, item_id: int):
     """
     Удалить товар по его ID.
     """
-    with get_session() as db:
-        item = db.query(Item).filter(Item.id == item_id).first()
-        if not item:
-            raise ValueError("Item not found")
-        db.delete(item)
-        db.commit()
+    stmt = select(Item).where(Item.id == item_id)
+    result = await session.execute(stmt)
+    item = result.scalars().first()
+
+    if not item:
+        raise ValueError("Item not found")
+    await session.delete(item)
+    await session.commit()

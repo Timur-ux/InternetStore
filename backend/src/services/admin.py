@@ -1,57 +1,45 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from models.user import User
 from models.buy import Buy
-from db.session import get_session
-from auth import hash_password
 
 
-def get_all_users():
+async def get_all_users(session: AsyncSession):
     """
     Получить список всех пользователей.
     """
-    with get_session() as db:
-        return db.query(User).all()
+    stmt = select(User)
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 
-def delete_user_by_id(user_id: int):
+async def delete_user_by_id(session: AsyncSession, user_id: int):
     """
     Удалить пользователя по его ID.
     """
-    with get_session() as db:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            raise ValueError("User not found")
-        db.delete(user)
-        db.commit()
+    stmt = select(User).where(User.id == user_id)
+    result = await session.execute(stmt)
+    user = result.scalars().first()
+
+    if not user:
+        raise ValueError("User not found")
+    await session.delete(user)
+    await session.commit()
 
 
-def get_sales_report():
+async def get_sales_report(session: AsyncSession):
     """
     Получить общий отчет по продажам.
     """
-    with get_session() as db:
-        return db.query(Buy).all()
+    stmt = select(Buy)
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 
-def get_user_sales(user_id: int):
+async def get_user_sales(session: AsyncSession, user_id: int):
     """
     Получить продажи по пользователю.
     """
-    with get_session() as db:
-        return db.query(Buy).filter(Buy.user_id == user_id).all()
-
-
-def add_user(login: str, password: str, access_level: int) -> User:
-    """
-    Добавить нового пользователя.
-    """
-    with get_session() as db:
-        existing_user = db.query(User).filter(User.login == login).first()
-        if existing_user:
-            raise ValueError("User with this login already exists.")
-        hashed_password = hash_password(password)
-        new_user = User(login=login, password=hashed_password, access_level=access_level)
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        return new_user
+    stmt = select(Buy).where(Buy.user_id == user_id)
+    result = await session.execute(stmt)
+    return result.scalars().all()

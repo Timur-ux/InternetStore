@@ -4,7 +4,7 @@ from services.admin import (
     delete_user_by_id,
     get_sales_report,
     get_user_sales,
-    add_user,
+    # add_user,
 )
 
 router = APIRouter()
@@ -52,13 +52,13 @@ def user_sales(user_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/admin/users")
-def create_new_user(login: str, password: str, access_level: int):
-    """
-    Создать нового пользователя.
-    """
-    try:
-        user = add_user(login, password, access_level)
-        return {"message": "User created successfully", "user_id": user.id}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+# @router.post("/admin/users")
+# def create_new_user(login: str, password: str, access_level: int):
+#     """
+#     Создать нового пользователя.
+#     """
+#     try:
+#         user = add_user(login, password, access_level)
+#         return {"message": "User created successfully", "user_id": user.id}
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))

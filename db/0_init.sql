@@ -1,6 +1,6 @@
-create database InternetStore;
+create database internetstore;
 
-\c InternetStore
+\c internetstore
 
 CREATE TABLE item (
   id BIGSERIAL PRIMARY KEY,                     -- Уникальный идентификатор товара

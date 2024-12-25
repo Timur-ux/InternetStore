@@ -1,13 +1,10 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from models.user import User
-from db.session import get_session
+from src.core.config import settings
 import bcrypt
 import jwt
 import datetime
-from auth import hash_password
-
-# ПЕРЕНЕСТИ В .env !!! 
-SECRET_KEY = "your_super_secret_key"  # Рекомендуется хранить в переменных окружения
 
 
 def hash_password(password: str) -> str:
@@ -34,31 +31,36 @@ def generate_jwt(user_id: int, access_level: int) -> str:
         "access_level": access_level,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
     }
-    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    return jwt.encode(payload, settings.secret_key, algorithm="HS256")
 
 
-def register_user(login: str, password: str, access_level: int) -> User:
+async def register_user(session: AsyncSession, login: str, password: str, access_level: int) -> User:
     """
     Регистрация нового пользователя.
     """
-    with get_session() as db:
-        existing_user = db.query(User).filter(User.login == login).first()
-        if existing_user:
-            raise ValueError("User with this login already exists.")
-        hashed_password = hash_password(password)
-        new_user = User(login=login, password=hashed_password, access_level=access_level)
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        return new_user
+    hashed_password = hash_password(password)
+    stmt = select(User).where(User.login == login)
+    result = await session.execute(stmt)
+    existing_user = result.scalars().first()
+
+    if existing_user:
+        raise ValueError("User with this login already exists.")
+
+    new_user = User(login=login, password=hashed_password, access_level=access_level)
+    session.add(new_user)
+    await session.commit()
+    await session.refresh(new_user)
+    return new_user
 
 
-def authenticate_user(login: str, password: str) -> str:
+async def authenticate_user(session: AsyncSession, login: str, password: str) -> str:
     """
     Аутентификация пользователя.
     """
-    with get_session() as db:
-        user = db.query(User).filter(User.login == login).first()
-        if not user or not verify_password(password, user.password):
-            return None
-        return generate_jwt(user.id, user.access_level)
+    stmt = select(User).where(User.login == login)
+    result = await session.execute(stmt)
+    user = result.scalars().first()
+
+    if not user or not verify_password(password, user.password):
+        return None
+    return generate_jwt(user.id, user.access_level)

@@ -1,9 +1,25 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import declarative_base
+from src.core.config import settings
+
+Base = declarative_base()
 
 
-# перенести в .env или конфиг
-DATABASE_URL = "postgresql://user:password@localhost/InternetStore"
+engine = create_async_engine(
+    str(settings.postgres_conn), echo=settings.echo, future=True
+)
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+async_session = async_sessionmaker(
+    bind=engine, class_=AsyncSession, expire_on_commit=False
+)
+
+
+async def get_session() -> AsyncSession:
+    async with async_session() as session:
+        try:
+            yield session
+        except Exception as e:
+            await session.rollback()
+            raise e
+        finally:
+            await session.close()
