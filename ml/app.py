@@ -1,4 +1,3 @@
-#!venv/bin/python
 from typing import Optional, List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
