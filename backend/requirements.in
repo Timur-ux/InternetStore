@@ -4,5 +4,9 @@ psycopg2-binary
 pyjwt
 bcrypt
 requests
+<<<<<<< HEAD
 sqlalchemy
 psycopg2
+=======
+sqlalchemy
+>>>>>>> 77bf29d (Some rafactoring)

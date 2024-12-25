@@ -1,30 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
-from sqlalchemy.orm import Session
-from services.auth_service import verify_jwt, create_user, authenticate_user
-from models.user import RegModel, LoginModel
-from db.init import get_db
+from fastapi import APIRouter, Depends, HTTPException
+from services.auth import register_user, authenticate_user
 
 router = APIRouter()
 
 @router.post("/register")
-def register(user: RegModel, authorization: str = Header(None), db: Session = Depends(get_db)):
-    if authorization is None:
-        raise HTTPException(status_code=400, detail="Authorization header missing")
-    token = authorization.split(" ")[1]
-    if user.access_level == 2:
-        try:
-            decoded_token = verify_jwt(token)
-        except ValueError as e:
-            raise HTTPException(status_code=401, detail=str(e))
+def register(login: str, password: str, access_level: int):
+    """
+    Регистрация нового пользователя.
+    """
     try:
-        create_user(db, user.login, user.password, user.access_level)
-        return {"message": "User registered successfully"}
+        user = register_user(login, password, access_level)
+        return {"message": "User registered successfully", "user_id": user.id}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error registering user: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/login")
-def login(user: LoginModel, db: Session = Depends(get_db)):
-    token = authenticate_user(db, user.login, user.password)
+def login(login: str, password: str):
+    """
+    Аутентификация пользователя.
+    """
+    token = authenticate_user(login, password)
     if not token:
         raise HTTPException(status_code=401, detail="Invalid login or password")
     return {"token": token}

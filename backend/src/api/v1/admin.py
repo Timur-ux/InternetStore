@@ -1,31 +1,64 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
-from services.admin_service import get_user_actions, get_selled_items, get_recommendations
-from dependencies.auth import authenticate_user
-from db.init import get_db
+from fastapi import APIRouter, HTTPException
+from services.admin import (
+    get_all_users,
+    delete_user_by_id,
+    get_sales_report,
+    get_user_sales,
+    add_user,
+)
 
 router = APIRouter()
 
-@router.get("/history")
-def history(time: str = None, user=Depends(authenticate_user), db: Session = Depends(get_db)):
-    if user["access_level"] < 2:
-        raise HTTPException(status_code=403, detail="Permission denied")
-    start_time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S") if time else datetime.now() - timedelta(days=1)
-    actions = get_user_actions(db, start_time)
-    return {"actions": actions}
+@router.get("/admin/users")
+def list_users():
+    """
+    Получить список всех пользователей.
+    """
+    try:
+        return get_all_users()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/selled")
-def selled(time: str = None, user=Depends(authenticate_user), db: Session = Depends(get_db)):
-    if user["access_level"] < 2:
-        raise HTTPException(status_code=403, detail="Permission denied")
-    start_time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S") if time else datetime.now() - timedelta(days=1)
-    selled_items = get_selled_items(db, start_time)
-    return {"selled_items": selled_items}
+@router.delete("/admin/users/{user_id}")
+def delete_user(user_id: int):
+    """
+    Удалить пользователя по идентификатору.
+    """
+    try:
+        delete_user_by_id(user_id)
+        return {"message": "User deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/recommendation")
-def recommendation(n: int = Query(1, ge=1), user=Depends(authenticate_user), db: Session = Depends(get_db)):
-    recommendations = get_recommendations(db, user["user_id"], n)
-    if not recommendations:
-        raise HTTPException(status_code=404, detail="No recommendations found")
-    return {"recommendations": recommendations}
+@router.get("/admin/sales")
+def list_sales():
+    """
+    Получить отчет по продажам.
+    """
+    try:
+        return get_sales_report()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/admin/sales/{user_id}")
+def user_sales(user_id: int):
+    """
+    Получить продажи по пользователю.
+    """
+    try:
+        return get_user_sales(user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/admin/users")
+def create_new_user(login: str, password: str, access_level: int):
+    """
+    Создать нового пользователя.
+    """
+    try:
+        user = add_user(login, password, access_level)
+        return {"message": "User created successfully", "user_id": user.id}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

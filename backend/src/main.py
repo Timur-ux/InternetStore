@@ -2,12 +2,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.v1 import auth, items, admin
 from src.core.config import DB_CONFIG
-from src.db.sessionManager import SessionManager
+from src.db.session import SessionManager
 
 # Initialize application
 app = FastAPI(
     title="Internet Store API",
+<<<<<<< HEAD
     version="1.0.0",
+=======
+    description="API для интернет-магазина",
+    version="1.0.0",
+    docs_url="/swagger",  # Переопределяет URL Swagger UI
+>>>>>>> 77bf29d (Some rafactoring)
 )
 
 # CORS settings

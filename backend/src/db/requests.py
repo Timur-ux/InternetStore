@@ -1,4 +1,4 @@
-import src.db.sessionManager as sm
+import src.db.session as sm
 from contextlib import closing
 from psycopg2.extras import DictCursor
 import jwt
