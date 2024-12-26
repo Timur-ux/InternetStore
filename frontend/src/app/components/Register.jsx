@@ -1,11 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { processRegister } from "../../services/register";
 import style from "../../style";
-import { setLogin, setPassword } from "../reducers/authData";
+import { selectAuthData, setLogin, setPassword } from "../reducers/authData";
 import { store } from "../store";
 import TextField from "./TextField";
 
 const Register = () => {
-  var authData = {};
+  var authData = useSelector(selectAuthData);
+  const [message, setMessage] = useState("");
+  const [color, setColor] = useState("green");
+
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
       authData = store.getState().authData.data;
@@ -13,17 +18,30 @@ const Register = () => {
     return () => unsubscribe();
   }, []);
 
-  const onRegisterClick = () => {
+  const onRegisterClick = async () => {
     const { login, password } = authData;
-    console.log("Register processing:", authData);
+    const response = await processRegister({ login, password })
+      .then(() => {
+        setMessage(
+          "Регистрация прошла успешно, теперь вы можете пройти в свой профиль",
+        );
+        setColor("green");
+      })
+      .catch(() => {
+        setMessage("Ошибка, пользователь с таким именем уже существует");
+        setColor("red");
+      });
   };
 
   return (
     <div style={{ ...style.infoBlock, ...style.centered }}>
+      <div>
+        <p style={{ color: color }}>{message}</p>
+      </div>
       <p>Login</p>
-      <TextField onBlur={setLogin} />
+      <TextField onChange={setLogin} />
       <p>Password</p>
-      <TextField onBlur={setPassword} type="password" />
+      <TextField onChange={setPassword} type="password" />
       <br />
       <div style={style.itemsLine}>
         <button style={style.centered} onClick={onRegisterClick}>
@@ -36,4 +54,3 @@ const Register = () => {
 };
 
 export default Register;
-

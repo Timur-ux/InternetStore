@@ -10,6 +10,7 @@ const initialState = {
     status: AuthStatus.notLogged,
     login: "",
     password: "",
+    balance: 0,
   },
 };
 
@@ -21,8 +22,10 @@ const authSlice = createSlice({
       state.data.login = action.payload;
     },
     setPassword(state, action) {
-      console.log("Set password: ", action.payload);
       state.data.password = action.payload;
+    },
+    setBalance(state, action) {
+      state.data.balance = action.payload;
     },
     onLogIn(state, action) {
       state.data.status = AuthStatus.logged;
@@ -33,7 +36,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setLogin, setPassword, onLogOut, onLogIn} = authSlice.actions;
+export const { setLogin, setPassword, setBalance, onLogOut, onLogIn} = authSlice.actions;
 export default authSlice.reducer;
 
 export const selectAuthData = (state) => state.authData.data;

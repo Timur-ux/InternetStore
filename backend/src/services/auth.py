@@ -1,3 +1,4 @@
+from typing import Dict, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from src.models.user import User
@@ -22,14 +23,13 @@ def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode(), hashed.encode())
 
 
-def generate_jwt(user_id: int, access_level: int) -> str:
+def generate_jwt(payload: Dict, expire_time = datetime.timedelta(hours=1)) -> str:
     """
     Генерация JWT токена.
     """
     payload = {
-        "user_id": user_id,
-        "access_level": access_level,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+        **payload,
+        "exp": datetime.datetime.utcnow() + expire_time,
     }
     return jwt.encode(payload, settings.secret_key, algorithm="HS256")
 
@@ -53,7 +53,7 @@ async def register_user(session: AsyncSession, login: str, password: str, access
     return new_user
 
 
-async def authenticate_user(session: AsyncSession, login: str, password: str) -> str:
+async def authenticate_user(session: AsyncSession, login: str, password: str) -> Optional[str]:
     """
     Аутентификация пользователя.
     """
@@ -63,4 +63,4 @@ async def authenticate_user(session: AsyncSession, login: str, password: str) ->
 
     if not user or not verify_password(password, user.password):
         return None
-    return generate_jwt(user.id, user.access_level)
+    return generate_jwt({"user_id": user.id, "access_level": user.access_level})

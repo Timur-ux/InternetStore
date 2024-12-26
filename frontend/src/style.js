@@ -46,6 +46,7 @@ const style = {
   },
   itemsLine: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     border: "1px solid black",
     paddingLeft: "5%",
@@ -91,6 +92,8 @@ const style = {
     justifyContent: "space-between",
     margin: "10px",
     padding: "2px",
+  }, itemOnItemsLine: {
+    margin: "5px"
   }
 };
 

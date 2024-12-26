@@ -12,7 +12,7 @@ export const RequestType = {
 };
 
 export const doRequest = async ({ type, uri, params = {}, body = {} }) => {
-  console.log("doRequest: uri: ", uri);
+  console.log("doRequest: uri: ", {type, uri, params, body});
   switch (type) {
     case RequestType.get:
       return await client.get(uri, { params: params });

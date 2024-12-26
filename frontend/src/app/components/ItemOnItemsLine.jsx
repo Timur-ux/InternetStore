@@ -17,8 +17,7 @@ const ItemOnItemsLine = ({id, title = "None", uri, description = "" , price = nu
   return (
     <div style={style.itemOnItemsLine}>
       <button onClick={onCLickButton}>
-        <p>Title: {title}</p>
-        <p>Description: {description}</p>
+        <p>{title}</p>
         <p>Price: {price == null ? "" : price}</p>
       </button>
     </div>

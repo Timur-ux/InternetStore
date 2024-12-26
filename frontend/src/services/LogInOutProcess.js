@@ -1,15 +1,16 @@
 import { AuthStatus, onLogOut } from "../app/reducers/authData";
+import client from "./client";
 
-export const LogInOutProcess = (authStatus) => {
+export const LogInOutProcess = async (authStatus) => {
   if (authStatus == AuthStatus.logged) {
-    console.log("TODO: add cookies clean when log out");
-    return ({dispatch, navigate}) => {
+    return async ({dispatch, navigate}) => {
       dispatch(onLogOut());
       navigate("/");
+      await client.post("/logout");
     }
   }
   else if (authStatus == AuthStatus.notLogged) {
-    return ({dispatch = null, navigate}) => navigate("/auth");
+    return async ({dispatch = null, navigate}) => navigate("/auth");
   } 
 
   console.log("LogInOutProcess: error: undefined authStatus: ", authStatus);

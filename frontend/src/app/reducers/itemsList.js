@@ -6,7 +6,7 @@ import client, { doRequest, RequestType } from "../../services/client";
 export const fetchItems = createAsyncThunk(
   "items/fetchItems",
   async () => {
-    const response = await doRequest({type: RequestType.get, uri: "/items"});
+    const response = await doRequest({ type: RequestType.get, uri: "/items" });
     return response.data;
   },
   {
@@ -20,8 +20,7 @@ export const fetchItems = createAsyncThunk(
 );
 
 const initialState = {
-  // data: [] // Default
-  data: [{id: 1, title: "item1", uri: "/item/1", description: "Some description about item 1", price: "261$"}, {id: 2, title: "item2", uri: "/item/2", description: "Some description about item 2", price: "100$"}], // for tests purposes
+  data: [], // Default
   status: "idle",
   error: null,
 };
@@ -55,7 +54,18 @@ const itemsSlice = createSlice({
       .addCase(fetchItems.fulfilled, (state, action) => {
         state.status = "succeeded";
         console.log("ItemsSlice: recieved items: ", action.payload);
-        state.data.push(...action.payload.items);
+        const preparedItems = action.payload.items.map((item) => {
+          return {
+            ...item,
+            title: item.name,
+            id: item.id,
+          };
+        });
+        console.log("ItemsSlice: prepired items: ", preparedItems);
+        state.data.push(...preparedItems);
+        state.data.push(...preparedItems);
+        state.data.push(...preparedItems);
+        state.data.push(...preparedItems);
       })
       .addCase(fetchItems.rejected, (state, action) => {
         state.status = "failed";
