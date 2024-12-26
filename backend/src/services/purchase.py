@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.item import Item
-from models.buy import Buy
-from models.user import User
+from src.models.item import Item
+from src.models.buy import Buy
+from src.models.user import User
 from typing import List
 from sqlalchemy import select
 

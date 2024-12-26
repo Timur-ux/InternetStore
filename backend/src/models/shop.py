@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BigInteger, String
 from sqlalchemy.orm import relationship
-from models.base import Base
+from src.models.base import Base
 from .item import item_shop
 
 class Shop(Base):

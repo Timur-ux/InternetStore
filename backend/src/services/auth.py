@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from models.user import User
+from src.models.user import User
 from src.core.config import settings
 import bcrypt
 import jwt

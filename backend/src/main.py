@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.v1 import auth, items, admin, user
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
+from fastapi.openapi.models import SecuritySchemeType
 
 # Initialize application
 app = FastAPI(
@@ -9,6 +12,9 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/swagger",  # Переопределяет URL Swagger UI
 )
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
 
 # CORS settings
 origins = ["http://localhost:8080"]
@@ -20,7 +26,6 @@ app.add_middleware(
     allow_methods=['*'],
 )
 
-# Include routers
 app.include_router(auth.router, prefix="/api/v1", tags=["Authentication"])
 app.include_router(items.router, prefix="/api/v1", tags=["Items"])
 app.include_router(admin.router, prefix="/api/v1", tags=["Admin"])

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BigInteger, String, Numeric, Integer, Date, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from models.base import Base
+from src.models.base import Base
 
 # Define the association table
 item_shop = Table(

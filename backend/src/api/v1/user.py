@@ -1,10 +1,10 @@
-from services.balance import get_user_balance, top_up_balance
+from src.services.balance import get_user_balance, top_up_balance
 from fastapi import APIRouter, Depends, HTTPException, Cookie
-from db.session import get_session
-from services.purchase import process_purchase
+from src.db.session import get_session
+from src.services.purchase import process_purchase
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
-from dependencies.auth import get_current_user
+from src.dependencies.auth import get_current_user
 
 router = APIRouter()
 
@@ -18,6 +18,7 @@ async def get_balance(
         return {"balance": balance}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/user/balance/top-up", summary="Пополнить баланс пользователя")
 async def top_up(

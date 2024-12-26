@@ -1,5 +1,5 @@
 from sqlalchemy import Column, BigInteger, Numeric, Integer, DateTime, ForeignKey
-from models.base import Base
+from src.models.base import Base
 
 class Buy(Base):
     __tablename__ = "buy"

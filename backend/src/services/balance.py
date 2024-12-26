@@ -1,6 +1,6 @@
 from yookassa import Configuration, Payment
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.user import User
+from src.models.user import User
 
 # Настройка SDK ЮKassa
 Configuration.account_id = "<your_account_id>"

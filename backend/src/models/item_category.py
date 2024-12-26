@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BigInteger, String
 from sqlalchemy.orm import relationship
-from models.base import Base
+from src.models.base import Base
 
 class ItemCategory(Base):
     __tablename__ = "item_category"

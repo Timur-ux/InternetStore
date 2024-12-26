@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from models.user import User
-from models.buy import Buy
+from src.models.user import User
+from src.models.buy import Buy
 
 
 async def get_all_users(session: AsyncSession):
