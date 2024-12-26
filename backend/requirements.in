@@ -11,3 +11,4 @@ asyncpg
 greenlet
 yookassa
 async-fastapi-jwt-auth
+jose

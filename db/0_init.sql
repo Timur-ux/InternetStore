@@ -51,11 +51,12 @@ create table  buy (
   buy_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create table  users (
-  id bigserial primary key,
-  access_level bigint not null,
+CREATE TABLE users (
+  id bigserial PRIMARY KEY,
+  access_level bigint NOT NULL,
   login varchar(100),
-  password varchar(64)
+  password varchar(64),
+  balance decimal(10, 2) DEFAULT 0.00
 );
 
 create table  access (

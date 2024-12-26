@@ -13,8 +13,6 @@ app = FastAPI(
     docs_url="/swagger",  # Переопределяет URL Swagger UI
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
 
 # CORS settings
 origins = ["http://localhost:8080"]
