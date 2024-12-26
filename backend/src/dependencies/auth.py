@@ -41,7 +41,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     if user_data is None:
         raise HTTPException(status_code=401, detail="Invalid token")
     
-    return user_data# Функция для получения текущего пользователя
+    return user_data
 
 async def get_current_user_id(token: str = Depends(oauth2_scheme)) -> int:
     """
