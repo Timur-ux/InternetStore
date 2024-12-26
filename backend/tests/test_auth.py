@@ -1,34 +1,66 @@
-# test_auth.py
 import pytest
-from fastapi.testclient import TestClient
-from src.models.user import User
-from src.db.session_test import get_session_test, cleanup  # Импортируем сессию и очистку
 
 @pytest.mark.asyncio
-async def test_register_user(client: TestClient):
-    """
-    Тест на регистрацию нового пользователя
-    """
-    login = "test1"
-    password = "test1"
-
-    # Отправляем запрос на регистрацию
-    response = client.post("/api/v1/register", params={"login": login, "password": password})
+async def test_register(client):
+    # Успешная регистрация
+    response = await client.post(
+        "/api/v1/register", params={"login": "testuser", "password": "testpassword"}
+    )
     print(response.json())
     assert response.status_code == 200
-    data = response.json()
-    assert data["message"] == "User registered successfully"
-    assert "user_id" in data
-    
-    # Получаем сессию для работы с тестовой базой
-    db = next(get_session_test())
-    
-    # Проверка, что пользователь был создан в базе данных
-    user_id = data["user_id"]
-    user = db.query(User).filter(User.id == user_id).first()  # Используем синхронный запрос для тестов
-    assert user is not None
-    assert user.login == login
+    assert response.json()["message"] == "User registered successfully"
 
-    # Очистка базы данных после теста
-    cleanup()
 
+@pytest.mark.asyncio
+async def test_login(client):
+    # Регистрация пользователя
+    await client.post(
+        "/api/v1/register", params={"login": "testuser", "password": "testpassword"}
+    )
+    # Логин пользователя
+    response = await client.post(
+        "/api/v1/login", params={"login": "testuser", "password": "testpassword"}
+    )
+    assert response.status_code == 200
+    assert "token" in response.json()
+    assert response.json()["message"] == "Login successful"
+
+
+@pytest.mark.asyncio
+async def test_register_existing_user(client):
+    # Регистрация пользователя
+    await client.post(
+        "/api/v1/register", params={"login": "testuser", "password": "testpassword"}
+    )
+    
+    # Пытаться зарегистрировать того же пользователя
+    response = await client.post(
+        "/api/v1/register", params={"login": "testuser", "password": "newpassword"}
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "User with this login already exists."
+
+
+@pytest.mark.asyncio
+async def test_login_invalid_password(client):
+    # Регистрация пользователя
+    await client.post(
+        "/api/v1/register", params={"login": "testuser", "password": "testpassword"}
+    )
+    
+    # Логин с неправильным паролем
+    response = await client.post(
+        "/api/v1/login", params={"login": "testuser", "password": "wrongpassword"}
+    )
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid login or password"
+
+
+@pytest.mark.asyncio
+async def test_login_non_existing_user(client):
+    # Пытаться залогиниться с несуществующим пользователем
+    response = await client.post(
+        "/api/v1/login", params={"login": "nonexistentuser", "password": "testpassword"}
+    )
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid login or password"

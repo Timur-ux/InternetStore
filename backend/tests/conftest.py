@@ -1,23 +1,39 @@
 import pytest
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from httpx import ASGITransport, AsyncClient
+from src.models.base import Base
 from src.main import app
-from fastapi.testclient import TestClient
-import pytest
-from fastapi.testclient import TestClient
-from src.db.session_test import get_session_test, cleanup, SessionLocal
+from src.db.session import get_session
 
+# Создаем тестовый движок SQLite
+TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+test_engine = create_async_engine(TEST_DATABASE_URL, future=True, echo=False)
+TestingSessionLocal = sessionmaker(
+    bind=test_engine, class_=AsyncSession, expire_on_commit=False
+)
 
-# Фикстура для создания базы данных для тестов
-@pytest.fixture(scope="module")
-def test_db():
-    # Используем тестовую сессию
-    db = next(get_session_test())  # Получаем сессию из get_session_test
-    yield db
-    # Очистка базы данных после тестов
-    cleanup()
+@pytest.fixture(scope="function")
+async def setup_database():
+    """
+    Подготовка тестовой базы данных.
+    """
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
-# Фикстура для клиента FastAPI
-@pytest.fixture(scope="module")
-def client(test_db):
-    app.dependency_overrides[SessionLocal] = lambda: test_db
-    client = TestClient(app)
-    yield client
+@pytest.fixture
+async def client(setup_database):
+    """
+    Переопределяем get_session и создаем тестовый клиент.
+    """
+    async def override_get_session():
+        async with TestingSessionLocal() as session:
+            yield session
+
+    app.dependency_overrides[get_session] = override_get_session
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as test_client:
+        yield test_client
