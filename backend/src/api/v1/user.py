@@ -4,14 +4,14 @@ from src.db.session import get_session
 from src.services.purchase import process_purchase
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
-from src.dependencies.auth import get_current_user
+from src.dependencies.auth import get_current_user_id
 
 router = APIRouter()
 
 @router.get("/user/balance", summary="Получить баланс пользователя")
 async def get_balance(
     session: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_user_id)
 ):
     try:
         balance = await get_user_balance(session, user_id)
@@ -24,7 +24,7 @@ async def get_balance(
 async def top_up(
     amount: float,
     session: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user)
+    user_id: int = Depends(get_current_user_id)
 ):
     try:
         payment_url = await top_up_balance(session, user_id, amount)
@@ -37,7 +37,7 @@ async def top_up(
 async def purchase_items(
     uris: List[str],
     session: AsyncSession = Depends(get_session),
-    user_id: int = Depends(get_current_user),
+    user_id: int = Depends(get_current_user_id),
 ):
     try:
         await process_purchase(session, user_id, uris)

@@ -10,7 +10,9 @@ class Settings(BaseSettings):
     )
     base_dir: str = str(Path(__file__).parent.parent)
     postgres_conn: PostgresDsn = Field(
-        "postgresql+asyncpg://root:qwerty@postgres:5432/InternetStore",
+        # "postgresql+asyncpg://root:qwerty@postgres:5432/InternetStore",
+
+        "postgresql+asyncpg://postgres:password@localhost:5432/internetstore",
         alias="DATABASE_CONN",
         env="DATABASE_CONN",
     )
