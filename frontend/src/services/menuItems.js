@@ -23,7 +23,7 @@ export const profileMenuItems = {
     {
       id: 3,
       name: "Предсказание продаж",
-      path: "prediction",
+      path: "forecast",
     }
   ]
 } ;

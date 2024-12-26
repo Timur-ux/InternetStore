@@ -16,6 +16,7 @@ const style = {
   },
   profileLine: {
     display: "flex",
+    justifyContent: "space-between",
     padding: "5px",
   },
   profileMenu: {
@@ -25,10 +26,10 @@ const style = {
     minWidth: "75%",
   },
   profileButton: {
-    marginLeft: "auto",
+    margin: "5px 5px 5px 5px",
     width: "fit-content",
     backgroundColor: "#FFFFFF",
-    padding: "5px",
+    padding: "10px",
     border: "2px solid gray",
     borderRadius: "10px",
   },
@@ -76,6 +77,21 @@ const style = {
     marginTop: "5%",
     padding: "30px"
   },
+  forecastSelectionMenu: {
+    width: "fit-content",
+    marginLeft: "auto",
+    marginRight: "auto",
+    border: "2px solid black",
+    minWidth: "60%",
+    marginTop: "5%",
+    padding: "30px"
+  },
+  cartItemStyle: {
+    display: "flex",
+    justifyContent: "space-between",
+    margin: "10px",
+    padding: "2px",
+  }
 };
 
 export default style;

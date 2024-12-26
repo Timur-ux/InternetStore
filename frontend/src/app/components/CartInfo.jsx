@@ -1,27 +1,40 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { BuyProcess } from "../../services/BuyProcess";
+import { DoRemoveFromCart } from "../../services/DoRemoveFromCart";
 import style from "../../style";
-import { selectItemsCart } from "../reducers/itemsCart";
+import { removeFromCart, selectItemsCart } from "../reducers/itemsCart";
+import { store } from "../store";
 
 const CartInfo = () => {
   const navigate = useNavigate();
-  const items = useSelector(selectItemsCart);
-  console.log("Cart Info: items:", items);
+  const dispatch = useDispatch();
+  var items = useSelector(selectItemsCart);
+
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      items = store.getState().itemsCart.data;
+    });
+
+    return () => unsubscribe();
+  }, [])
 
   const navigateTo = item => () => {
-    console.log("Cart Info: navigateTo: item:", item);
     navigate("/item", {state: item});
   }
   const itemsElement = items.map((item) => (
-    <li>
-      <a onClick={navigateTo(item)}>{item.title}</a>
+    <li style={{width: "100%"}}>
+    <div style={style.cartItemStyle}>
+      <a style={{marginRight: "100%"}}onClick={navigateTo(item)}>{item.title}</a>
+      <button style={{marginLeft: "100%"}} onClick={() => DoRemoveFromCart(dispatch, item.id)}>Remove</button>
+    </div>
     </li>
   ));
 
-  const onBuyClicked = () => {
-    // TODO buy processing
-    console.log("Buy processing, really... no");
+  const onBuyClicked = async () => {
+    console.log("Processing buying next items: ", items);
+    await BuyProcess(items);
   }
 
   return (<div style={style.cartInfo}>

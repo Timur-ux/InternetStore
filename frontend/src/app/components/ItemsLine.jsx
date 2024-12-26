@@ -5,9 +5,7 @@ import {
   fetchItems,
   selectAllItems,
   selectItemsStatus,
-  selectState,
 } from "../reducers/itemsList";
-import ItemInfo from "./ItemInfo";
 import ItemOnItemsLine from "./ItemOnItemsLine";
 
 const ItemsLine = () => {

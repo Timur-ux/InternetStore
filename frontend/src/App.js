@@ -11,6 +11,7 @@ import ItemInfo from "./app/components/ItemInfo";
 import Auth from "./app/components/Auth";
 import Register from "./app/components/Register";
 import CartInfo from "./app/components/CartInfo";
+import ForecastSelection from "./app/components/ForecastSelection";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/auth" element={<Auth />}></Route>
         <Route path="/register" element={<Register />}></Route>
         <Route path="/cart" element={<CartInfo />}></Route>
+        <Route path="/forecast" element={<ForecastSelection />}/>
       </Routes>
       <Footer />
     </div>

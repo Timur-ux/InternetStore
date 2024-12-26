@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import client from "../../services/client";
+import client, { doRequest, RequestType } from "../../services/client";
 
 // TODO: clear list due to user logout via extraReducers
 
 export const fetchItems = createAsyncThunk(
   "items/fetchItems",
   async () => {
-    const response = await client.get("/api/items");
+    const response = await doRequest({type: RequestType.get, uri: "/items"});
     return response.data;
   },
   {
@@ -20,8 +20,8 @@ export const fetchItems = createAsyncThunk(
 );
 
 const initialState = {
-  // data: [],
-  data: [{title: "item1", uri: "/api/item/1", description: "Some description about item 1"}, {title: "item2", uri: "/api/item/2", description: "Some description about item 2"}],
+  // data: [] // Default
+  data: [{id: 1, title: "item1", uri: "/item/1", description: "Some description about item 1", price: "261$"}, {id: 2, title: "item2", uri: "/item/2", description: "Some description about item 2", price: "100$"}], // for tests purposes
   status: "idle",
   error: null,
 };
@@ -34,12 +34,17 @@ const itemsSlice = createSlice({
       state.data.push(action.payload);
     },
     itemUpdated(state, action) {
-      const { id, title, content } = action.payload;
+      const { id, title, uri, description } = action.payload;
       const existingItem = state.data.find((item) => item.id === id);
       if (existingItem) {
         existingItem.title = title;
-        existingItem.content = content;
+        existingItem.uri = uri;
+        existingItem.description = description;
       }
+    },
+    itemRemoved(state, action) {
+      const { id } = action.payload;
+      state.data = state.data.filter((item) => item.id !== id);
     },
   },
   extraReducers: (builder) =>
@@ -49,7 +54,8 @@ const itemsSlice = createSlice({
       })
       .addCase(fetchItems.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.data.push(...action.payload);
+        console.log("ItemsSlice: recieved items: ", action.payload);
+        state.data.push(...action.payload.items);
       })
       .addCase(fetchItems.rejected, (state, action) => {
         state.status = "failed";
@@ -57,7 +63,7 @@ const itemsSlice = createSlice({
       }),
 });
 
-export const { itemAdded, itemUpdated } = itemsSlice.actions;
+export const { itemAdded, itemUpdated, itemRemoved } = itemsSlice.actions;
 export default itemsSlice.reducer;
 
 export const selectState = (state) => state;
