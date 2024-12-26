@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.services.auth import register_user, authenticate_user
 from src.db.session import get_session 
+from src.dependencies.auth import get_user_type
+
 router = APIRouter()
 
 @router.post("/register")
@@ -22,18 +24,20 @@ async def register(
 
 @router.post("/login")
 async def login(
-    login: str, 
-    password: str, 
+    login: str,
+    password: str,
     response: Response,
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
+    current_user_type: str = Depends(get_user_type)  # Получаем тип пользователя
 ):
     """
-    Аутентификация пользователя.
+    Аутентификация пользователя. В ответе будет добавлен тип пользователя.
     """
     token = await authenticate_user(session, login, password)
     if not token:
         raise HTTPException(status_code=401, detail="Invalid login or password")
     
+    # Устанавливаем JWT токен в cookies
     response.set_cookie(key="access_token", value=token, httponly=True)
     
-    return {"message": "Login successful", "token": token}
+    return {"message": "Login successful", "token": token, "user_type": current_user_type}

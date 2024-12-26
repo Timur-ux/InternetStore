@@ -13,19 +13,42 @@ ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 
 # Функция для декодирования JWT токена
-def decode_jwt(token: str) -> Optional[int]:
+def decode_jwt(token: str) -> Optional[dict]:
+    """
+    Декодирует JWT токен и извлекает информацию о пользователе (user_id, access_level).
+    """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
-        if user_id is None:
+        access_level = payload.get("access_level")
+        
+        if user_id is None or access_level is None:
             return None
-        return int(user_id)
+        
+        return {"user_id": user_id, "access_level": access_level}
+    
     except PyJWTError:
         return None
-
+    
 # Функция для получения текущего пользователя
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> int:
-    user_id = decode_jwt(token)
-    if user_id is None:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+    """
+    Получает информацию о текущем пользователе на основе JWT токена.
+    Возвращает словарь с 'user_id' и 'access_level'.
+    """
+    user_data = decode_jwt(token)
+    
+    if user_data is None:
         raise HTTPException(status_code=401, detail="Invalid token")
-    return user_id
+    
+    return user_data
+
+# Функция для получения типа пользователя (рядовой пользователь/администратор)
+async def get_user_type(current_user: dict = Depends(get_current_user)) -> str:
+    """
+    Определяет тип пользователя в зависимости от уровня доступа.
+    Возвращает 'Администратор' или 'Рядовой пользователь'.
+    """
+    if current_user["access_level"] >= 2:
+        return "Администратор"
+    return "Рядовой пользователь"
