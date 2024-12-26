@@ -1,61 +1,70 @@
-create database ArucoService;
+create database internetstore;
 
-\c ArucoService
+\c internetstore
 
-create table  marks (
-  id bigserial primary key,
-  mark_id int,
-  mark_type bigint not null,
-  location_id bigint not null,
-  last_position float[3]
+-- Обновление таблицы item (удаление shop_id)
+CREATE TABLE item (
+  item_id BIGSERIAL PRIMARY KEY,                       -- Уникальный идентификатор товара
+  item_name VARCHAR(100) NOT NULL,                -- Название товара
+  uri VARCHAR(255) NOT NULL,                      -- URL для получения данных о товаре
+  item_category_id BIGINT NOT NULL,               -- Уникальный идентификатор категории товара
+  item_price NUMERIC(10, 2) NOT NULL,            -- Текущая цена товара
+  item_cnt_day INT,                               -- Количество проданных товаров за день
+  date DATE,                                       -- Дата в формате dd/mm/yyyy
+  date_block_num INT,                             -- Номер месяца (0 - январь 2013, 1 - февраль 2013 и т.д.)
+  item_category_name VARCHAR(100) NOT NULL        -- Название категории товара
 );
 
-create table  marks_on_objects (
-  mark_id bigint not null,
-  object_id bigint not null,
-  relative_pos float[3] not null
+-- Обновление таблицы shop (остается без изменений)
+CREATE TABLE shop (
+  shop_id BIGSERIAL PRIMARY KEY,                  -- Уникальный идентификатор магазина
+  shop_name VARCHAR(100) NOT NULL                 -- Название магазина
 );
 
-create table  objects (
-  id bigserial primary key,
-  name varchar(200),
-  size float[3],
-  marks bigint[]
+-- Создание промежуточной таблицы для связи многие-ко-многим
+CREATE TABLE item_shop (
+  item_id BIGINT NOT NULL,                       -- Уникальный идентификатор товара
+  shop_id BIGINT NOT NULL,                       -- Уникальный идентификатор магазина
+  PRIMARY KEY (item_id, shop_id),                -- Композитный первичный ключ
+  FOREIGN KEY (item_id) REFERENCES item(item_id),     -- Внешний ключ на таблицу item
+  FOREIGN KEY (shop_id) REFERENCES shop(shop_id) -- Внешний ключ на таблицу shop
 );
 
-create table  locations (
-  id bigserial primary key,
-  name varchar(200),
-  min_pos float[3] not null,
-  max_pos float[3] not null
+CREATE TABLE item_category (
+  item_category_id BIGSERIAL PRIMARY KEY,       -- Уникальный идентификатор категории товара
+  item_category_name VARCHAR(100) NOT NULL       -- Название категории товара
 );
 
-create table  mark_types (
-  id bigserial primary key,
-  name varchar(100) not null,
-  family varchar(100)
+
+CREATE TABLE user_actions (
+  id bigserial PRIMARY KEY,
+  user_id bigint NOT NULL,
+  action varchar(100) NOT NULL,
+  action_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create table  user_actions (
+create table  buy (
   id bigserial primary key,
   user_id bigint not null,
-  action varchar(100) not null
+  item_id bigint not null,
+  price NUMERIC(10, 2),
+  cnt INT,
+  buy_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create table  users (
-  id bigserial primary key,
-  access_level bigint not null,
+CREATE TABLE users (
+  id bigserial PRIMARY KEY,
+  access_level bigint NOT NULL,
   login varchar(100),
-  password varchar(64)
+  password varchar(64),
+  balance decimal(10, 2) DEFAULT 0.00
 );
 
 create table  access (
   id bigserial primary key,
-  name varchar(100),
-  privileges bigint[] not null
+  name varchar(100)
 );
-
-create table  privilege (
+create table  action (
   id bigserial primary key,
-  name varchar(100) not null
+  name varchar(100)
 );

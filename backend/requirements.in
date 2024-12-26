@@ -1,3 +1,15 @@
 fastapi
 uvicorn
 psycopg2-binary
+pyjwt
+bcrypt
+requests
+pydantic_settings
+sqlalchemy
+psycopg2
+asyncpg
+greenlet
+yookassa
+async-fastapi-jwt-auth
+jose
+httpx

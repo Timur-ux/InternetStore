@@ -1,72 +1,48 @@
-insert into
-  locations (name, min_pos, max_pos)
-values
-  (
-    'hall',
-    array[0.0, 0.0, 0.0],
-    array[5.0, 5.0, 5.0]
-  ),
-  (
-    'main_storage',
-    array[-45.0, 0.0, 0.0],
-    array[0.0, 15.0, 25.0]
-  ),
-  (
-    'buffer_storage',
-    array[5.0, 0.0, 0.0],
-    array[10.0, 7.0, 10.0]
-  );
+-- Заполнение таблицы access
+INSERT INTO access(name)
+VALUES
+  ('user'),
+  ('administrator');
 
-insert into
-  mark_types (name, family)
-values
-  (
-    'aruco',
-    null
-  ),
-  (
-    'apriltag',
-    'tag25h9'
-  ),
-  (
-    'apriltag',
-    'tagStandart41h12'
-  ),
-  (
-    'aruco',
-    'MIP_36h12'
-  );
+-- Заполнение таблицы action
+INSERT INTO action(name)
+VALUES
+  ('buy');
 
-insert into
-  privilege (name)
-values
-  ( 'read' ),
-  ( 'edit_table' ),
-  ( 'edit_users' );
+-- Заполнение таблицы users
+INSERT INTO users(access_level, login, password)
+VALUES
+  ((SELECT id FROM access WHERE name = 'administrator'), 'admin', '$2a$10$YgzepzPAE0OZWr9P6mQVu.Ind9xcSN/DGCfOiVT8XClxWjWLWbfpa');
 
-insert into
-  access(name, privileges)
-values
-  (
-    'user',
-    array(select id from privilege where name = 'read')
-  ),
-  (
-    'redactor',
-    array(select id from privilege
-     where name = 'read' or name = 'edit_table'
-    )
-  ),
-  (
-    'administrator',
-    array(select id from privilege)
-  );
+-- Заполнение таблицы shop
+INSERT INTO shop(shop_name)
+VALUES
+  ('Shop A'),
+  ('Shop B'),
+  ('Shop C');
 
-insert into
- users(access_level, login, password)
-values
-  (
-    (select id from access where name = 'administrator'),
-    'admin',
-    '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
-  );
+-- Заполнение таблицы item_category
+INSERT INTO item_category(item_category_name)
+VALUES
+  ('Electronics'),
+  ('Clothing'),
+  ('Home Appliances');
+
+-- Заполнение таблицы item
+INSERT INTO item(item_id, item_name, uri, item_category_id, item_price, item_cnt_day, date, date_block_num, item_category_name)
+VALUES
+  (1, 'Smartphone', 'http://example.com/item/1', 1, 699.99, 10, '2023-10-01', 33, 'Electronics'),
+  (2, 'Laptop', 'http://example.com/item/2', 1, 1299.99, 5, '2023-10-01', 33, 'Electronics'),
+  (3, 'T-Shirt', 'http://example.com/item/3', 2, 19.99, 20, '2023-10-01', 33, 'Clothing'),
+  (4, 'Washing Machine', 'http://example.com/item/4', 3, 499.99, 2, '2023-10-01', 33, 'Home Appliances'),
+  (5, 'Headphones', 'http://example.com/item/5', 1, 89.99, 15, '2023-10-01', 33, 'Electronics');
+
+-- Связывание товаров с магазинами в промежуточной таблице item_shop
+INSERT INTO item_shop(item_id, shop_id)
+VALUES
+  (1, 1),  -- Smartphone в Shop A
+  (1, 2),  -- Smartphone в Shop B
+  (2, 2),  -- Laptop в Shop B
+  (3, 1),  -- T-Shirt в Shop A
+  (4, 3),  -- Washing Machine в Shop C
+  (5, 2);  -- Headphones в Shop B
