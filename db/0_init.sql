@@ -46,6 +46,7 @@ CREATE TABLE user_actions (
 create table  buy (
   id bigserial primary key,
   user_id bigint not null,
+  item_id bigint not null,
   price NUMERIC(10, 2),
   cnt INT,
   buy_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP

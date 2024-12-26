@@ -23,10 +23,11 @@ async def get_balance(
 @router.post("/user/balance/top-up", summary="Пополнить баланс пользователя")
 async def top_up(
     amount: float,
-    user_id: int = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+    user_id: int = Depends(get_current_user)
 ):
     try:
-        payment_url = await top_up_balance(user_id, amount)
+        payment_url = await top_up_balance(session, user_id, amount)
         return {"payment_url": payment_url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

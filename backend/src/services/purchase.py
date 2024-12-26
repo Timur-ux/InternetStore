@@ -17,7 +17,7 @@ async def process_purchase(session: AsyncSession, user_id: int, uris: List[str])
     if not items:
         raise ValueError("Items not found")
 
-    total_cost = sum(item.price for item in items)
+    total_cost = sum(item.item_price for item in items)
     user = await session.get(User, user_id)
 
     if not user or user.balance < total_cost:
@@ -26,7 +26,7 @@ async def process_purchase(session: AsyncSession, user_id: int, uris: List[str])
     user.balance -= total_cost
 
     for item in items:
-        buy = Buy(user_id=user.id, item_id=item.id, price=item.price, cnt=1)
+        buy = Buy(user_id=user.id, item_id=item.item_id, price=item.item_price, cnt=1)
         session.add(buy)
 
     await session.commit()
