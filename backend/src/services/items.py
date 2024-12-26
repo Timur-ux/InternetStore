@@ -24,8 +24,6 @@ async def get_all_items(session: AsyncSession) -> List[dict]:
                 {
                     "shop_id": shop.shop_id,
                     "shop_name": shop.shop_name,
-                    # Если цена хранится в промежуточной таблице, нужно добавить соответствующее поле
-                    # "price": shop.price,  # Убедитесь, что у вас есть поле price в промежуточной таблице
                 }
                 for shop in item.shops
             ],
@@ -53,7 +51,6 @@ async def get_items_by_uris(session: AsyncSession, uris: List[str]) -> List[dict
                 {
                     "shop_id": shop.shop_id,
                     "shop_name": shop.shop_name,
-                    # "price": shop.price,  # Убедитесь, что у вас есть поле price в промежуточной таблице
                 }
                 for shop in item.shops
             ],

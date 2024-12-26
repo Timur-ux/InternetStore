@@ -7,6 +7,7 @@ from src.models.item import Item
 from src.models.shop import Shop
 from src.main import app
 from src.db.session import get_session
+from sqlalchemy import text
 
 # Создаем тестовый движок SQLite
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -40,6 +41,7 @@ async def setup_database_with_data(setup_database):
         session.add_all([shop1, shop2, shop3])
         await session.commit()
 
+        # Создаем тестовые товары
         item1 = Item(
             item_name="Item 1", 
             item_price=100.0, 
@@ -63,23 +65,21 @@ async def setup_database_with_data(setup_database):
         )
 
         # Связываем товары с магазинами
-        item1.shops.append(shop1)
-        item1.shops.append(shop2)
-        item2.shops.append(shop2)
-        item2.shops.append(shop3)
-        item3.shops.append(shop1)
+        item1.shops = [shop1, shop2]  # Правильная связь через атрибут
+        item2.shops = [shop2, shop3]  # Правильная связь через атрибут
+        item3.shops = [shop1]         # Правильная связь через атрибут
 
         session.add_all([item1, item2, item3])
         await session.commit()
 
     yield  # После выполнения тестов фикстура вернет управление обратно
 
-    # Очистка базы данных после тестов
+    # Очистка базы данных после тестов с использованием text()
     async with TestingSessionLocal() as session:
-        await session.execute("DELETE FROM item_shop") 
-        await session.execute("DELETE FROM item")  
-        await session.execute("DELETE FROM shop") 
-        await session.execute("DELETE FROM users")
+        await session.execute(text("DELETE FROM item_shop")) 
+        await session.execute(text("DELETE FROM item"))  
+        await session.execute(text("DELETE FROM shop")) 
+        await session.execute(text("DELETE FROM users"))
         await session.commit()
 
 @pytest.fixture
