@@ -5,6 +5,7 @@ from httpx import ASGITransport, AsyncClient
 from src.models.base import Base
 from src.models.item import Item
 from src.models.shop import Shop
+from src.models.user import User
 from src.main import app
 from src.db.session import get_session
 from sqlalchemy import text
@@ -72,6 +73,16 @@ async def setup_database_with_data(setup_database):
         session.add_all([item1, item2, item3])
         await session.commit()
 
+        # Создаем тестового пользователя
+        user = User(
+            access_level=2, 
+            login='admin',
+            password='$2a$10$YgzepzPAE0OZWr9P6mQVu.Ind9xcSN/DGCfOiVT8XClxWjWLWbfpa',
+            balance=250
+        )
+        session.add(user)
+        await session.commit()
+
     yield  # После выполнения тестов фикстура вернет управление обратно
 
     # Очистка базы данных после тестов с использованием text()
@@ -81,6 +92,7 @@ async def setup_database_with_data(setup_database):
         await session.execute(text("DELETE FROM shop")) 
         await session.execute(text("DELETE FROM users"))
         await session.commit()
+
 
 @pytest.fixture
 async def client(setup_database):
