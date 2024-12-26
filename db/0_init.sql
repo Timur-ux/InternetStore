@@ -1,6 +1,6 @@
-create database internetstore;
+create database InternetStore;
 
-\c internetstore
+\c InternetStore
 
 -- Обновление таблицы item (удаление shop_id)
 CREATE TABLE item (

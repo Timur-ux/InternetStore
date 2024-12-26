@@ -1,4 +1,4 @@
-FROM python:3.8 AS builder
+FROM python:3.9 AS builder
 
 RUN python -m venv /venv;
 
@@ -8,7 +8,7 @@ COPY ./requirements.txt  .
 
 RUN /venv/bin/pip install --no-cache-dir --upgrade -r requirements.txt
 
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 WORKDIR /code
 
@@ -18,4 +18,4 @@ ENV PATH=/venv/bin:$PATH
 
 COPY . .
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0"]

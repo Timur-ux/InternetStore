@@ -4,6 +4,7 @@ from src.models.buy import Buy
 from src.models.user import User
 from typing import List
 from sqlalchemy import select
+from datetime import datetime
 
 async def process_purchase(session: AsyncSession, user_id: int, uris: List[str]):
     """
@@ -26,7 +27,7 @@ async def process_purchase(session: AsyncSession, user_id: int, uris: List[str])
     user.balance -= total_cost
 
     for item in items:
-        buy = Buy(user_id=user.id, item_id=item.item_id, price=item.item_price, cnt=1)
+        buy = Buy(user_id=user.id, item_id=item.item_id, price=item.item_price, cnt=1, buy_time=datetime.now())
         session.add(buy)
 
     await session.commit()

@@ -47,13 +47,11 @@ async def get_user_sales(session: AsyncSession, user_id: int):
 
 
 
-async def get_sales_forecast(item_ids: Optional[List[int]] = None, item_uris: Optional[List[str]] = None):
+async def get_sales_forecast(item_uris: Optional[List[str]] = None):
     url = "http://forecast_service_url/predict"  # Здесь указываем адрес сервиса прогнозирования
     payload = {}
 
-    if item_ids:
-        payload['item_ids'] = item_ids
-    elif item_uris:
+    if item_uris:
         payload['item_uris'] = item_uris
     else:
         # Если не передан ни список товаров, ни URI, делаем прогноз для всех товаров
