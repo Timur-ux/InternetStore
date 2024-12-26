@@ -54,6 +54,7 @@ async def get_items_by_uris(session: AsyncSession, uris: List[str]) -> List[dict
                 }
                 for shop in item.shops
             ],
+            "price": item.item_price,
         }
         for item in items
     ]
