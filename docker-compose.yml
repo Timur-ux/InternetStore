@@ -15,6 +15,11 @@ services:
     networks:
       - frontend
       - backend
+    environment:
+      - DATABASE_CONN=postgresql+asyncpg://root:qwerty@postgres:5432/InternetStore 
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    depends_on:
+      - postgres
 
   postgres:
     image: postgres:13.3
@@ -24,11 +29,10 @@ services:
       POSTGRES_PASSWORD: "qwerty"
       PGDATA: "/var/lib/postgresql/data/pgdata"
     networks:
-        - backend
+      - backend
     volumes:
       - ./db/:/docker-entrypoint-initdb.d
       - ./db/storage/:/var/lib/postgresql/data/pgdata
-
 
 networks:
   frontend:

@@ -41,7 +41,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     if user_data is None:
         raise HTTPException(status_code=401, detail="Invalid token")
     
-    return user_data
+    return user_data# Функция для получения текущего пользователя
+
+async def get_current_user_id(token: str = Depends(oauth2_scheme)) -> int:
+    """
+    Получает информацию о текущем пользователе на основе JWT токена.
+    Возвращает словарь с 'user_id' и 'access_level'.
+    """
+    user_data = decode_jwt(token)
+    
+    if user_data is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    return user_data["user_id"]
 
 # Функция для получения типа пользователя (рядовой пользователь/администратор)
 async def get_user_type(current_user: dict = Depends(get_current_user)) -> str:
@@ -49,6 +61,16 @@ async def get_user_type(current_user: dict = Depends(get_current_user)) -> str:
     Определяет тип пользователя в зависимости от уровня доступа.
     Возвращает 'Администратор' или 'Рядовой пользователь'.
     """
+    if current_user["access_level"] >= 2:
+        return "Администратор"
+    return "Рядовой пользователь"
+
+async def get_user_type_by_token(token: str) -> str:
+    """
+    Определяет тип пользователя в зависимости от уровня доступа.
+    Возвращает 'Администратор' или 'Рядовой пользователь'.
+    """
+    current_user = decode_jwt(token)
     if current_user["access_level"] >= 2:
         return "Администратор"
     return "Рядовой пользователь"

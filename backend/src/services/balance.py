@@ -5,6 +5,7 @@ from src.models.user import User
 from decimal import Decimal
 
 async def get_user_balance(session: AsyncSession, user_id: int) -> float:
+    print(user_id)
     user = await session.get(User, user_id)
     if not user:
         raise ValueError("User not found")

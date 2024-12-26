@@ -9,7 +9,8 @@ sqlalchemy
 psycopg2
 asyncpg
 greenlet
-yookassa
 async-fastapi-jwt-auth
 jose
 httpx
+pytest
+pytest-asyncio
