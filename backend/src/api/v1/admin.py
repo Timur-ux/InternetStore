@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from src.services.admin import get_sales_forecast
 from src.dependencies.auth import get_user_type
 from src.models.forecast import ForecastRequest
