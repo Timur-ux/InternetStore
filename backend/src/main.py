@@ -1,9 +1,6 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.v1 import auth, items, admin, user
-from fastapi.security import OAuth2PasswordBearer
-from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
-from fastapi.openapi.models import SecuritySchemeType
 
 # Initialize application
 app = FastAPI(
