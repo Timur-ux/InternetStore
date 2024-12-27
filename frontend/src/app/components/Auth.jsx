@@ -23,7 +23,7 @@ const Auth = () => {
 
   const onAuthClick = async () => {
     const { login, password } = authData;
-    const response = await processAuth({ login, password })
+    const response = await processAuth(dispatch, { login, password })
       .then(() => {
         setMessage(
           "Успешный вход в магазин",

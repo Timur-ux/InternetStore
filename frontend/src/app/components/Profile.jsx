@@ -8,7 +8,6 @@ import {
   selectAuthData,
   selectAuthStatus,
 } from "../reducers/authData";
-import { getBalance } from "../../services/balance";
 
 const Profile = () => {
   const [display, setDisplay] = useState(false);
@@ -24,7 +23,7 @@ const Profile = () => {
     },
     {
       title: authStatus == AuthStatus.logged ? "Log out" : "Log in",
-      action: async () => (await LogInOutProcess(authStatus))({ dispatch, navigate }),
+      action: async () => (await LogInOutProcess(authStatus, authData.token))({ dispatch, navigate }),
     },
   ];
   if (authStatus == AuthStatus.logged) {
