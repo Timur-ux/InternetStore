@@ -5,7 +5,7 @@ export const BuyProcess = async (items) => {
 
   const response = await doRequest(
     {
-      type: RequestType.post, uri: "/buy", body: {
+      type: RequestType.post, uri: "/purchase", body: {
         item_uris: uris
       }
     }

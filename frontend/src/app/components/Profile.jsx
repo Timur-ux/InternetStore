@@ -8,6 +8,7 @@ import {
   selectAuthData,
   selectAuthStatus,
 } from "../reducers/authData";
+import { getBalance } from "../../services/balance";
 
 const Profile = () => {
   const [display, setDisplay] = useState(false);

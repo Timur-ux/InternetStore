@@ -7,8 +7,6 @@ const InfoBlock = () => {
     <div
       style={{ ...style.centeredText, ...style.infoBlock, ...style.baseBackground }}
     >
-      Main info placed here
-      <br />
       <Outlet/>
     </div>
   );
