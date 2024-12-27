@@ -52,7 +52,7 @@ const Auth = () => {
         <button style={style.centered} onClick={onAuthClick}>
           Submit
         </button>
-        <a href="/register">Регистрация</a>
+        <button onClick={() => navigate("/register")}>Регистрация</button>
       </div>
     </div>
   );

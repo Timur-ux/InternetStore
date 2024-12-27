@@ -63,9 +63,6 @@ const itemsSlice = createSlice({
         });
         console.log("ItemsSlice: prepired items: ", preparedItems);
         state.data.push(...preparedItems);
-        state.data.push(...preparedItems);
-        state.data.push(...preparedItems);
-        state.data.push(...preparedItems);
       })
       .addCase(fetchItems.rejected, (state, action) => {
         state.status = "failed";
