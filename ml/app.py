@@ -4,34 +4,32 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from src.service.randomModel import RandomModel
-import src.db.sessionManager as sm
-from src.core.config import DB_CONFIG
 
+app = FastAPI(docs_url="/swagger")
 
-# sessionManager = sm.SessionManager(DB_CONFIG)
-
-app = FastAPI()
-
-# origins = [
-#         "*"
-#         ]
+origins = [
+        "*"
+        ]
 #
-# app.add_middleware(
-#         CORSMiddleware,
-#         allow_origins=origins,
-#         allow_credentials=True,
-#         allow_headers=['*'],
-#         allow_methods=['*'],
-#         )
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=False,
+        allow_headers=['*'],
+        allow_methods=['*'],
+        )
 
 model = RandomModel()
 
 
 class ForecastItems(BaseModel):
-    items: List[int]
+    item_uris: List[str]
 
 
-@app.get("/")
+@app.post("/")
 def forecast(items: ForecastItems):
-    result = model.predict(items.items)
-    return {"predicted_item_cnt_monthly": result}
+    result = model.predict(items.item_uris)
+    response = []
+    for k, v in zip(items.item_uris, result):
+        response.append({"uri": k, "forecast": v})
+    return {"forecast": response}

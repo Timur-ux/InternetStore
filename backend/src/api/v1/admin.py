@@ -15,7 +15,7 @@ async def get_forecast(
     user_type: str = Depends(get_user_type),
 ):
     # Проверим, является ли пользователь администратором
-    if user_type != "administrator":
+    if user_type != "Администратор":
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     # Получаем прогноз

@@ -5,6 +5,11 @@ export const AuthStatus = {
   notLogged: "NotLoggedIn",
 };
 
+export const UserType = {
+  user: "user",
+  admin: "admin"
+};
+
 const initialState = {
   data: {
     status: AuthStatus.notLogged,
@@ -12,6 +17,7 @@ const initialState = {
     password: "",
     balance: 0,
     token: "",
+    userType: UserType.user
   },
 };
 
@@ -19,6 +25,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    setUserType(state, action) {
+      state.data.userType = action.payload;
+    },
     setToken(state, action) {
       console.log("AuthData: setToken: ", action.payload);
       state.data.token = action.payload;
@@ -46,6 +55,7 @@ export const {
   setPassword,
   setBalance,
   setToken,
+  setUserType,
   onLogOut,
   onLogIn,
 } = authSlice.actions;

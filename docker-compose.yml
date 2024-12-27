@@ -16,7 +16,7 @@ services:
       - frontend
       - backend
     environment:
-      - DATABASE_CONN=postgresql+asyncpg://root:qwerty@postgres:5432/InternetStore 
+      - DATABASE_CONN=postgresql+asyncpg://root:qwerty@postgres:5432/InternetStore
       - PGDATA=/var/lib/postgresql/data/pgdata
     depends_on:
       - postgres
@@ -26,6 +26,8 @@ services:
       context: ./ml/
     networks:
       - backend
+    ports:
+      - 5001:8000
 
   postgres:
     image: postgres:13.3
