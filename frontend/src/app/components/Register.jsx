@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { processRegister } from "../../services/register";
 import style from "../../style";
 import { selectAuthData, setLogin, setPassword } from "../reducers/authData";
@@ -10,6 +11,7 @@ const Register = () => {
   var authData = useSelector(selectAuthData);
   const [message, setMessage] = useState("");
   const [color, setColor] = useState("green");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
@@ -47,7 +49,7 @@ const Register = () => {
         <button style={style.centered} onClick={onRegisterClick}>
           Submit
         </button>
-        <a href="/auth">Авторизация</a>
+        <button onClick={() => navigate("/auth")}>Авторизация</button>
       </div>
     </div>
   );
