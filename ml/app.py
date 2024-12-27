@@ -1,13 +1,14 @@
 from typing import Optional, List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
+from src.service.randomModel import RandomModel
 import src.db.sessionManager as sm
 from src.core.config import DB_CONFIG
-import json
 
 
-sessionManager = sm.SessionManager(DB_CONFIG)
+# sessionManager = sm.SessionManager(DB_CONFIG)
 
 app = FastAPI()
 
@@ -23,8 +24,14 @@ app = FastAPI()
 #         allow_methods=['*'],
 #         )
 
-@app.get("/")
-def forecast(items: Optional[List[int]] = None):
-    """Do forecast for `items` if given else for all existing items"""
-    pass
+model = RandomModel()
 
+
+class ForecastItems(BaseModel):
+    items: List[int]
+
+
+@app.get("/")
+def forecast(items: ForecastItems):
+    result = model.predict(items.items)
+    return {"predicted_item_cnt_monthly": result}
